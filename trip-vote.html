@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where To, Crew? — Trip Vote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lagoon-950:#07211f;
+    --lagoon-900:#0b2f2c;
+    --lagoon-800:#123f3a;
+    --lagoon-700:#1a5750;
+    --sand-100:#f2e9d8;
+    --sand-200:#e8dcc2;
+    --mango-500:#e8a33d;
+    --hibiscus-500:#e2536b;
+    --ink:#0b2f2c;
+    --line: rgba(242,233,216,0.16);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--lagoon-950);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(26,87,80,0.55), transparent 55%),
+      radial-gradient(circle at 90% 15%, rgba(232,163,61,0.10), transparent 45%);
+    color: var(--sand-100);
+    font-family: 'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{max-width: 780px; margin: 0 auto; padding: 28px 18px 80px;}
+
+  /* ---------- Hero ---------- */
+  .hero{padding: 8px 4px 26px; border-bottom: 1px dashed var(--line); margin-bottom: 22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--mango-500); margin-bottom: 10px; display:flex; gap:10px; align-items:center;
+  }
+  .eyebrow::before{content:"✈"; font-size:14px;}
+  h1{
+    font-family:'Fraunces', serif; font-weight:700; font-optical-sizing:auto;
+    font-size: clamp(34px, 8vw, 52px); line-height: 1.02; margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  .hero p{margin:0; color: var(--sand-200); font-size:15px; line-height:1.55; max-width:52ch;}
+  .hero .meta{
+    display:flex; flex-wrap:wrap; gap: 10px 22px; margin-top:16px;
+    font-family:'JetBrains Mono', monospace; font-size: 12.5px; color: var(--sand-200);
+  }
+  .hero .meta span b{color:var(--sand-100); font-weight:500;}
+
+  /* ---------- Tabs (boarding-pass stubs) ---------- */
+  .tabs{display:flex; gap:8px; margin: 22px 0 24px; overflow-x:auto; padding-bottom:2px;}
+  .tab{
+    font-family:'JetBrains Mono', monospace; font-size:12.5px; letter-spacing:.04em;
+    background: var(--lagoon-900); border:1px solid var(--line); color: var(--sand-200);
+    padding: 10px 16px; border-radius: 999px; cursor:pointer; white-space:nowrap;
+    transition: all .15s ease;
+  }
+  .tab.active{ background: var(--mango-500); color: var(--lagoon-950); border-color:var(--mango-500); font-weight:600;}
+  .tab:hover:not(.active){border-color: var(--mango-500); color: var(--sand-100);}
+
+  .panel{display:none;}
+  .panel.active{display:block; animation: fadein .25s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  .hint{color: var(--sand-200); font-size:13.5px; margin: 0 0 18px; line-height:1.5;}
+
+  /* ---------- Postcards (options) ---------- */
+  .card{
+    position:relative;
+    background: var(--sand-100); color: var(--ink);
+    border-radius: 14px; padding: 18px 18px 16px; margin-bottom: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 10px 24px -14px rgba(0,0,0,0.5);
+  }
+  .card .rank-badge{
+    position:absolute; top:-10px; left:-10px;
+    width:38px; height:38px; border-radius:50%;
+    background: var(--lagoon-950); color: var(--mango-500);
+    border: 2px dashed var(--mango-500);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14px;
+  }
+  .card-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+  .card h3{font-family:'Fraunces', serif; font-size:20px; margin:0 0 3px; font-weight:600;}
+  .card .loc{font-size:12.5px; color:#4a5a52; font-family:'JetBrains Mono', monospace;}
+  .tier{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.06em;
+    padding: 3px 9px; border-radius: 999px; white-space:nowrap; height:fit-content;
+    background: var(--lagoon-800); color: var(--sand-100);
+  }
+  .card p.desc{font-size:13.5px; line-height:1.5; margin: 10px 0 12px; color:#33413b;}
+  .card .vibe-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .vibe-tag{
+    font-size:11px; font-family:'JetBrains Mono', monospace;
+    background: var(--sand-200); padding: 3px 8px; border-radius:6px; color:#4a5a52;
+  }
+  .reorder{display:flex; gap:8px; align-items:center;}
+  .reorder button{
+    border:1px solid rgba(0,0,0,0.15); background:white; color:var(--ink);
+    width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:15px; line-height:1;
+  }
+  .reorder button:disabled{opacity:.25; cursor:default;}
+  .reorder button:hover:not(:disabled){background: var(--sand-200);}
+  .added-by{font-size:11px; color:#6b776f; margin-top:4px; font-style:italic;}
+
+  .save-bar{
+    position:sticky; bottom:14px; margin-top:18px; display:flex; justify-content:center;
+  }
+  .btn-primary{
+    font-family:'Inter', sans-serif; font-weight:600; font-size:14.5px;
+    background: var(--hibiscus-500); color:white; border:none;
+    padding: 13px 28px; border-radius: 999px; cursor:pointer;
+    box-shadow: 0 10px 24px -8px rgba(226,83,107,0.6);
+  }
+  .btn-primary:hover{filter:brightness(1.06);}
+  .btn-primary:active{transform: translateY(1px);}
+  .saved-note{
+    text-align:center; font-family:'JetBrains Mono', monospace; font-size:12px;
+    color: var(--mango-500); margin-top:10px; min-height:16px;
+  }
+
+  /* ---------- Leaderboard ---------- */
+  .lb-row{
+    display:flex; align-items:center; gap:14px; padding: 14px 4px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .lb-rank{
+    font-family:'Fraunces', serif; font-size:26px; font-weight:700; color: var(--mango-500);
+    width:36px; text-align:center; flex-shrink:0;
+  }
+  .lb-info{flex:1;}
+  .lb-info h4{margin:0 0 2px; font-family:'Fraunces', serif; font-size:17px; font-weight:600; color:var(--sand-100);}
+  .lb-info .lb-loc{font-size:12px; color:var(--sand-200); font-family:'JetBrains Mono', monospace;}
+  .lb-score{text-align:right; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sand-200); flex-shrink:0;}
+  .lb-score b{display:block; font-size:18px; color:var(--sand-100);}
+  .bar-track{height:4px; background:var(--lagoon-800); border-radius:2px; margin-top:8px; overflow:hidden;}
+  .bar-fill{height:100%; background: linear-gradient(90deg, var(--mango-500), var(--hibiscus-500));}
+
+  /* ---------- Suggest form ---------- */
+  .form-field{margin-bottom:14px;}
+  .form-field label{
+    display:block; font-family:'JetBrains Mono', monospace; font-size:11.5px;
+    letter-spacing:.05em; text-transform:uppercase; color: var(--mango-500); margin-bottom:6px;
+  }
+  .form-field input, .form-field textarea, .form-field select{
+    width:100%; background: var(--lagoon-900); border:1px solid var(--line);
+    color: var(--sand-100); padding: 11px 13px; border-radius:8px;
+    font-family:'Inter',sans-serif; font-size:14px;
+  }
+  .form-field textarea{resize:vertical; min-height:64px;}
+  .form-field input::placeholder, .form-field textarea::placeholder{color:#6d8079;}
+
+  /* ---------- Chat ---------- */
+  .chat-log{max-height: 46vh; overflow-y:auto; margin-bottom:16px; padding-right:2px;}
+  .msg{margin-bottom: 14px;}
+  .msg .msg-head{display:flex; gap:8px; align-items:baseline; margin-bottom:3px;}
+  .msg .msg-name{font-weight:600; font-size:13.5px; color: var(--mango-500);}
+  .msg .msg-time{font-family:'JetBrains Mono', monospace; font-size:10.5px; color:#6d8079;}
+  .msg .msg-text{font-size:14px; line-height:1.5; color:var(--sand-100); background:var(--lagoon-900); padding:9px 12px; border-radius:0 10px 10px 10px; display:inline-block; border:1px solid var(--line);}
+  .chat-input-row{display:flex; gap:8px;}
+  .chat-input-row input[type=text]{flex:1;}
+
+  /* ---------- Name gate ---------- */
+  .gate{
+    position:fixed; inset:0; background: rgba(7,33,31,0.92); backdrop-filter: blur(6px);
+    display:flex; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .gate-card{
+    background: var(--sand-100); color: var(--ink); border-radius:16px; padding:28px 26px;
+    max-width:360px; width:100%; text-align:center;
+  }
+  .gate-card .plane{font-size:28px; margin-bottom:10px;}
+  .gate-card h2{font-family:'Fraunces', serif; margin:0 0 8px; font-size:24px;}
+  .gate-card p{font-size:13.5px; color:#4a5a52; margin:0 0 18px; line-height:1.5;}
+  .gate-card input{
+    width:100%; padding:12px 14px; border-radius:8px; border:1px solid rgba(0,0,0,0.15);
+    font-size:15px; margin-bottom:14px; font-family:'Inter',sans-serif;
+  }
+  .empty{color:var(--sand-200); font-size:13.5px; font-style:italic; padding: 20px 4px;}
+  .loading{color:var(--sand-200); font-size:13px; font-family:'JetBrains Mono', monospace;}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <div class="plane">🧳</div>
+    <h2>Who's this?</h2>
+    <p>Enter your name so the group can see your ranking and chat messages. No password — just be nice.</p>
+    <input id="nameInput" type="text" placeholder="e.g. Sam" maxlength="30">
+    <button class="btn-primary" style="width:100%" onclick="setName()">Join the trip</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Group trip · July 6–11, 2027</div>
+    <h1>Where To, Crew?</h1>
+    <p>Belize is the front-runner, but we're open to the Caribbean and Costa Rica. Rank the options by your own taste and budget, add one we missed, and hash it out in the chat.</p>
+    <div class="meta">
+      <span>👥 <b id="voterCount">…</b> voting</span>
+      <span>✈️ out of <b>PHL / EWR</b></span>
+      <span>💺 <b>Premium economy</b></span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="vote">My Ranking</div>
+    <div class="tab" data-tab="leaderboard">Leaderboard</div>
+    <div class="tab" data-tab="suggest">Suggest a Spot</div>
+    <div class="tab" data-tab="chat">Chat</div>
+  </div>
+
+  <div id="panel-vote" class="panel active">
+    <p class="hint">Drag isn't reliable on every phone, so use the arrows — top of the list is your #1 pick. Hit save whenever you're happy with the order.</p>
+    <div id="voteList"><div class="loading">Loading options…</div></div>
+    <div class="save-bar"><button class="btn-primary" onclick="saveVote()">Save my ranking</button></div>
+    <div id="savedNote" class="saved-note"></div>
+  </div>
+
+  <div id="panel-leaderboard" class="panel">
+    <p class="hint">Ranked by everyone's input combined — top pick gets the most points from each person, and it all adds up here. Updates as people vote.</p>
+    <div id="leaderboardList"><div class="loading">Loading…</div></div>
+  </div>
+
+  <div id="panel-suggest" class="panel">
+    <p class="hint">Know a spot that fits (Belize, Caribbean, or Costa Rica)? Add it and it'll show up for everyone to rank.</p>
+    <div class="form-field"><label>Name of resort / area</label><input id="s-title" type="text" placeholder="e.g. Turtle Inn, Placencia"></div>
+    <div class="form-field"><label>Location</label><input id="s-loc" type="text" placeholder="e.g. Placencia, Belize"></div>
+    <div class="form-field"><label>Price tier</label>
+      <select id="s-tier"><option value="$">$ — Budget</option><option value="$$" selected>$$ — Mid-range</option><option value="$$$">$$$ — Upscale</option><option value="$$$$">$$$$ — Luxury</option></select>
+    </div>
+    <div class="form-field"><label>Why it fits</label><textarea id="s-desc" placeholder="Snorkeling nearby? Beach? Rainforest? All-inclusive? What's the vibe?"></textarea></div>
+    <button class="btn-primary" style="width:100%" onclick="submitSuggestion()">Add to the list</button>
+    <div id="suggestNote" class="saved-note"></div>
+  </div>
+
+  <div id="panel-chat" class="panel">
+    <div id="chatLog" class="chat-log"><div class="loading">Loading messages…</div></div>
+    <div class="chat-input-row">
+      <input id="chatInput" type="text" placeholder="Say something…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="btn-primary" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let myName = null;
+let optionsList = [];
+let votes = {};
+let messages = [];
+let myOrder = [];
+let pollTimer = null;
+
+const DEFAULT_OPTIONS = [
+  {id:'hamanasi', title:'Hamanasi', location:'Hopkins, Belize', tier:'$$$',
+   desc:'Dive- and snorkel-focused resort on the Hopkins coast with guided excursions to the barrier reef and easy day trips into Cockscomb Basin rainforest.',
+   vibe:['snorkeling','rainforest day trips','beach','all-inclusive optional'], addedBy:'starter list'},
+  {id:'belizean-dreams', title:'Belizean Dreams', location:'Hopkins, Belize', tier:'$$',
+   desc:'Beachfront villas with a pool, spa, and Garifuna-inspired restaurant serving tropical drinks. Reef snorkel trips arranged through the front desk.',
+   vibe:['beach relaxation','drinks','villas for groups'], addedBy:'starter list'},
+  {id:'sirenian-bay', title:'Sirenian Bay Resort & Villas', location:'Placencia Peninsula, Belize', tier:'$$$',
+   desc:'Secluded private beach and infinity pool, with access to both reef snorkeling and rainforest wildlife nearby. Villas work well for a group of 6+.',
+   vibe:['secluded','snorkeling','rainforest','villas'], addedBy:'starter list'},
+  {id:'ambergris-caye', title:'San Pedro / Ambergris Caye', location:'Ambergris Caye, Belize', tier:'$$',
+   desc:'Belize\\'s top spot for reef snorkeling right off the barrier reef. Lively town, lots of beach bars — rainforest is a day-trip, not on-site.',
+   vibe:['best snorkeling','beach bars','island town'], addedBy:'starter list'},
+  {id:'manuel-antonio', title:'Manuel Antonio', location:'Puntarenas, Costa Rica', tier:'$$$',
+   desc:'Rainforest meets beach right at the national park — monkeys and sloths on the trails, then straight into the water. Snorkeling is decent, not Belize-reef-level.',
+   vibe:['rainforest','beach','wildlife'], addedBy:'starter list'}
+];
+
+function tabSwitch(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+name));
+}
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>tabSwitch(t.dataset.tab)));
+
+function setName(){
+  const val = document.getElementById('nameInput').value.trim();
+  if(!val){ document.getElementById('nameInput').focus(); return; }
+  myName = val;
+  document.getElementById('gate').style.display = 'none';
+  init();
+}
+document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') setName(); });
+
+async function loadOptions(){
+  try{
+    const res = await window.storage.get('trip-options', true);
+    optionsList = res && res.value ? JSON.parse(res.value) : [];
+    if(!optionsList.length){
+      optionsList = DEFAULT_OPTIONS;
+      await window.storage.set('trip-options', JSON.stringify(optionsList), true);
+    }
+  }catch(e){
+    optionsList = DEFAULT_OPTIONS;
+    try{ await window.storage.set('trip-options', JSON.stringify(optionsList), true); }catch(e2){}
+  }
+}
+
+async function loadVotes(){
+  try{
+    const res = await window.storage.get('trip-votes', true);
+    votes = res && res.value ? JSON.parse(res.value) : {};
+  }catch(e){ votes = {}; }
+}
+
+async function loadMessages(){
+  try{
+    const res = await window.storage.get('trip-messages', true);
+    messages = res && res.value ? JSON.parse(res.value) : [];
+  }catch(e){ messages = []; }
+}
+
+function buildMyOrder(){
+  const ids = optionsList.map(o=>o.id);
+  if(votes[myName] && Array.isArray(votes[myName])){
+    const existing = votes[myName].filter(id=>ids.includes(id));
+    const missing = ids.filter(id=>!existing.includes(id));
+    myOrder = [...existing, ...missing];
+  } else {
+    myOrder = ids;
+  }
+}
+
+function renderVoteList(){
+  const el = document.getElementById('voteList');
+  if(!optionsList.length){ el.innerHTML = '<div class="empty">No options yet — add one in "Suggest a Spot".</div>'; return; }
+  el.innerHTML = myOrder.map((id, idx)=>{
+    const o = optionsList.find(x=>x.id===id);
+    if(!o) return '';
+    return `
+      <div class="card">
+        <div class="rank-badge">${idx+1}</div>
+        <div class="card-top">
+          <div>
+            <h3>${escapeHtml(o.title)}</h3>
+            <div class="loc">${escapeHtml(o.location)}</div>
+          </div>
+          <div class="tier">${escapeHtml(o.tier)}</div>
+        </div>
+        <p class="desc">${escapeHtml(o.desc)}</p>
+        <div class="vibe-tags">${o.vibe.map(v=>`<span class="vibe-tag">${escapeHtml(v)}</span>`).join('')}</div>
+        <div class="reorder">
+          <button onclick="moveOption(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+          <button onclick="moveOption(${idx},1)" ${idx===myOrder.length-1?'disabled':''}>↓</button>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6b776f;">move rank</span>
+        </div>
+        ${o.addedBy && o.addedBy!=='starter list' ? `<div class="added-by">suggested by ${escapeHtml(o.addedBy)}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function moveOption(idx, dir){
+  const newIdx = idx+dir;
+  if(newIdx<0 || newIdx>=myOrder.length) return;
+  [myOrder[idx], myOrder[newIdx]] = [myOrder[newIdx], myOrder[idx]];
+  renderVoteList();
+}
+
+async function saveVote(){
+  votes[myName] = myOrder;
+  const note = document.getElementById('savedNote');
+  try{
+    await window.storage.set('trip-votes', JSON.stringify(votes), true);
+    note.textContent = 'Saved ✓';
+  }catch(e){
+    note.textContent = 'Could not save — try again.';
+  }
+  setTimeout(()=>{ note.textContent=''; }, 2500);
+  renderLeaderboard();
+  renderVoterCount();
+}
+
+function computeScores(){
+  const scores = {}; const voterCounts = {};
+  optionsList.forEach(o=>{ scores[o.id]=0; voterCounts[o.id]=0; });
+  const names = Object.keys(votes);
+  names.forEach(name=>{
+    const order = votes[name].filter(id=>optionsList.some(o=>o.id===id));
+    const n = order.length;
+    order.forEach((id, idx)=>{
+      scores[id] = (scores[id]||0) + (n - idx);
+      voterCounts[id] = (voterCounts[id]||0) + 1;
+    });
+  });
+  return {scores, voterCounts, voterTotal: names.length};
+}
+
+function renderLeaderboard(){
+  const el = document.getElementById('leaderboardList');
+  if(!optionsList.length){ el.innerHTML = '<div class="empty">Nothing to rank yet.</div>'; return; }
+  const {scores, voterCounts} = computeScores();
+  const maxScore = Math.max(1, ...optionsList.map(o=>scores[o.id]||0));
+  const sorted = [...optionsList].sort((a,b)=>(scores[b.id]||0)-(scores[a.id]||0));
+  el.innerHTML = sorted.map((o, idx)=>`
+    <div class="lb-row">
+      <div class="lb-rank">${idx+1}</div>
+      <div class="lb-info">
+        <h4>${escapeHtml(o.title)}</h4>
+        <div class="lb-loc">${escapeHtml(o.location)} · ${escapeHtml(o.tier)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${((scores[o.id]||0)/maxScore*100)}%"></div></div>
+      </div>
+      <div class="lb-score"><b>${scores[o.id]||0}</b>${voterCounts[o.id]||0} voter${(voterCounts[o.id]||0)===1?'':'s'}</div>
+    </div>`).join('');
+}
+
+function renderVoterCount(){
+  document.getElementById('voterCount').textContent = Object.keys(votes).length;
+}
+
+async function submitSuggestion(){
+  const title = document.getElementById('s-title').value.trim();
+  const loc = document.getElementById('s-loc').value.trim();
+  const tier = document.getElementById('s-tier').value;
+  const desc = document.getElementById('s-desc').value.trim();
+  const note = document.getElementById('suggestNote');
+  if(!title || !loc){ note.textContent = 'Add at least a name and location.'; setTimeout(()=>note.textContent='',2500); return; }
+  const id = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Date.now().toString(36);
+  const newOption = {id, title, location:loc, tier, desc: desc || 'No description yet.', vibe:[], addedBy: myName};
+  try{
+    await loadOptions();
+    optionsList.push(newOption);
+    await window.storage.set('trip-options', JSON.stringify(optionsList), true);
+    note.textContent = 'Added ✓ — check "My Ranking" to place it.';
+    document.getElementById('s-title').value=''; document.getElementById('s-loc').value=''; document.getElementById('s-desc').value='';
+    buildMyOrder();
+    renderVoteList();
+    renderLeaderboard();
+  }catch(e){
+    note.textContent = 'Could not save — try again.';
+  }
+  setTimeout(()=>{ note.textContent=''; }, 3000);
+}
+
+function renderChat(){
+  const el = document.getElementById('chatLog');
+  if(!messages.length){ el.innerHTML = '<div class="empty">No messages yet — say hi.</div>'; return; }
+  el.innerHTML = messages.map(m=>`
+    <div class="msg">
+      <div class="msg-head"><span class="msg-name">${escapeHtml(m.name)}</span><span class="msg-time">${formatTime(m.ts)}</span></div>
+      <div class="msg-text">${escapeHtml(m.text)}</div>
+    </div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendMessage(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  try{
+    await loadMessages();
+    messages.push({name: myName, text, ts: Date.now()});
+    await window.storage.set('trip-messages', JSON.stringify(messages), true);
+    input.value='';
+    renderChat();
+  }catch(e){}
+}
+
+function formatTime(ts){
+  const d = new Date(ts);
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+async function refreshAll(){
+  const prevOptionsLen = optionsList.length;
+  await Promise.all([loadOptions(), loadVotes(), loadMessages()]);
+  if(optionsList.length !== prevOptionsLen){ buildMyOrder(); }
+  else {
+    const ids = optionsList.map(o=>o.id);
+    myOrder = myOrder.filter(id=>ids.includes(id));
+    ids.forEach(id=>{ if(!myOrder.includes(id)) myOrder.push(id); });
+  }
+  renderVoteList();
+  renderLeaderboard();
+  renderChat();
+  renderVoterCount();
+}
+
+async function init(){
+  await loadOptions();
+  await loadVotes();
+  await loadMessages();
+  buildMyOrder();
+  renderVoteList();
+  renderLeaderboard();
+  renderChat();
+  renderVoterCount();
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(refreshAll, 5000);
+}
+</script>
+</body>
+</html>
