@@ -234,6 +234,7 @@
       <span>✈️ out of <b>PHL / EWR</b></span>
       <span>💺 <b>Premium economy</b></span>
     </div>
+    <div id="whoami" style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sand-200); margin-top:12px;"></div>
   </div>
 
   <div class="tabs">
@@ -277,13 +278,41 @@
   </div>
 </div>
 
+<!-- Firebase gives this page a real shared database, so saves actually persist across everyone's devices -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script>
+// ---- PASTE YOUR FIREBASE CONFIG HERE (see setup instructions) ----
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCz0GAfQn_Ew7bqxqNJ4NYxJWJ7OlR-nwk",
+  authDomain: "rowan-vacation-2027.firebaseapp.com",
+  databaseURL: "https://rowan-vacation-2027-default-rtdb.firebaseio.com",
+  projectId: "rowan-vacation-2027",
+  storageBucket: "rowan-vacation-2027.firebasestorage.app",
+  messagingSenderId: "2192185979",
+  appId: "1:2192185979:web:7c778947dad45f2c8e60de"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const FIREBASE_NOT_CONFIGURED = firebaseConfig.apiKey === "YOUR_API_KEY";
+let db = null;
+if(!FIREBASE_NOT_CONFIGURED){
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+}
+
 let myName = null;
 let optionsList = [];
 let votes = {};
 let messages = [];
 let myOrder = [];
-let pollTimer = null;
 
 const DEFAULT_OPTIONS = [
   {id:'hamanasi', title:'Hamanasi', location:'Hopkins, Belize', tier:'$$$', url:'https://www.hamanasi.com/',
@@ -323,37 +352,46 @@ function setName(){
   const val = document.getElementById('nameInput').value.trim();
   if(!val){ document.getElementById('nameInput').focus(); return; }
   myName = val;
+  localStorage.setItem('tripvote_name', val);
   document.getElementById('gate').style.display = 'none';
   init();
 }
 document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') setName(); });
 
-async function loadOptions(){
-  try{
-    const res = await window.storage.get('trip-options', true);
-    optionsList = res && res.value ? JSON.parse(res.value) : [];
-    if(!optionsList.length){
-      optionsList = DEFAULT_OPTIONS;
-      await window.storage.set('trip-options', JSON.stringify(optionsList), true);
-    }
-  }catch(e){
-    optionsList = DEFAULT_OPTIONS;
-    try{ await window.storage.set('trip-options', JSON.stringify(optionsList), true); }catch(e2){}
+function switchUser(){
+  localStorage.removeItem('tripvote_name');
+  location.reload();
+}
+
+function safeKey(name){
+  return encodeURIComponent(name.trim().toLowerCase()).replace(/[.#$/\[\]%]/g, '_');
+}
+
+// On page load: skip the gate if we already know who this is; bail with a setup message if Firebase isn't configured yet
+window.addEventListener('DOMContentLoaded', () => {
+  if(FIREBASE_NOT_CONFIGURED){
+    document.getElementById('gate').innerHTML = `<div class="gate-card">
+      <div class="plane">🔧</div>
+      <h2>One setup step left</h2>
+      <p>This site needs a free Firebase database plugged in before it can save anything. Open <code>index.html</code>, find the <code>firebaseConfig</code> object near the top of the script, and paste in your project's config. Ask Claude for the setup steps if you haven't done this yet.</p>
+    </div>`;
+    return;
   }
-}
+  const savedName = localStorage.getItem('tripvote_name');
+  if(savedName){
+    myName = savedName;
+    document.getElementById('gate').style.display = 'none';
+    init();
+  }
+});
 
-async function loadVotes(){
-  try{
-    const res = await window.storage.get('trip-votes', true);
-    votes = res && res.value ? JSON.parse(res.value) : {};
-  }catch(e){ votes = {}; }
-}
-
-async function loadMessages(){
-  try{
-    const res = await window.storage.get('trip-messages', true);
-    messages = res && res.value ? JSON.parse(res.value) : [];
-  }catch(e){ messages = []; }
+async function seedOptionsIfEmpty(){
+  const snap = await db.ref('options').once('value');
+  if(!snap.exists()){
+    const seed = {};
+    DEFAULT_OPTIONS.forEach(o => seed[o.id] = o);
+    await db.ref('options').set(seed);
+  }
 }
 
 function buildMyOrder(){
@@ -365,6 +403,12 @@ function buildMyOrder(){
   } else {
     myOrder = ids;
   }
+}
+
+function reconcileMyOrder(){
+  const ids = optionsList.map(o=>o.id);
+  myOrder = myOrder.filter(id=>ids.includes(id));
+  ids.forEach(id=>{ if(!myOrder.includes(id)) myOrder.push(id); });
 }
 
 function renderVoteList(){
@@ -415,17 +459,18 @@ function moveOption(idx, dir){
 }
 
 async function saveVote(){
-  votes[myName] = myOrder;
   const note = document.getElementById('savedNote');
+  const btn = document.querySelector('.save-bar .btn-primary');
+  votes[myName] = myOrder;
+  btn.disabled = true; btn.textContent = 'Saving…';
   try{
-    await window.storage.set('trip-votes', JSON.stringify(votes), true);
-    note.textContent = 'Saved ✓';
+    await db.ref('votes/' + safeKey(myName)).set({name: myName, order: myOrder, updatedAt: Date.now()});
+    note.textContent = '✓ Saved — visible to the whole group now.';
   }catch(e){
-    note.textContent = 'Could not save — try again.';
+    note.textContent = '⚠ Could not save (' + (e && e.message ? e.message : 'connection issue') + '). Try again.';
   }
-  setTimeout(()=>{ note.textContent=''; }, 2500);
-  renderLeaderboard();
-  renderVoterCount();
+  btn.disabled = false; btn.textContent = 'Save my ranking';
+  setTimeout(()=>{ note.textContent=''; }, 4000);
 }
 
 function computeScores(){
@@ -475,18 +520,13 @@ async function submitSuggestion(){
   const note = document.getElementById('suggestNote');
   if(!title || !loc){ note.textContent = 'Add at least a name and location.'; setTimeout(()=>note.textContent='',2500); return; }
   const id = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Date.now().toString(36);
-  const newOption = {id, title, location:loc, tier, desc: desc || 'No description yet.', vibe:[], addedBy: myName};
+  const newOption = {id, title, location:loc, tier, desc: desc || 'No description yet.', vibe:[], addedBy: myName, photo:'📍', gradient:'linear-gradient(135deg,#1a5750,#0b2f2c)'};
   try{
-    await loadOptions();
-    optionsList.push(newOption);
-    await window.storage.set('trip-options', JSON.stringify(optionsList), true);
-    note.textContent = 'Added ✓ — check "My Ranking" to place it.';
+    await db.ref('options/' + id).set(newOption);
+    note.textContent = '✓ Added — check "My Ranking" to place it.';
     document.getElementById('s-title').value=''; document.getElementById('s-loc').value=''; document.getElementById('s-desc').value='';
-    buildMyOrder();
-    renderVoteList();
-    renderLeaderboard();
   }catch(e){
-    note.textContent = 'Could not save — try again.';
+    note.textContent = '⚠ Could not save — try again.';
   }
   setTimeout(()=>{ note.textContent=''; }, 3000);
 }
@@ -507,11 +547,8 @@ async function sendMessage(){
   const text = input.value.trim();
   if(!text) return;
   try{
-    await loadMessages();
-    messages.push({name: myName, text, ts: Date.now()});
-    await window.storage.set('trip-messages', JSON.stringify(messages), true);
+    await db.ref('messages').push({name: myName, text, ts: Date.now()});
     input.value='';
-    renderChat();
   }catch(e){}
 }
 
@@ -523,32 +560,35 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
 }
 
-async function refreshAll(){
-  const prevOptionsLen = optionsList.length;
-  await Promise.all([loadOptions(), loadVotes(), loadMessages()]);
-  if(optionsList.length !== prevOptionsLen){ buildMyOrder(); }
-  else {
-    const ids = optionsList.map(o=>o.id);
-    myOrder = myOrder.filter(id=>ids.includes(id));
-    ids.forEach(id=>{ if(!myOrder.includes(id)) myOrder.push(id); });
-  }
-  renderVoteList();
-  renderLeaderboard();
-  renderChat();
-  renderVoterCount();
-}
-
 async function init(){
-  await loadOptions();
-  await loadVotes();
-  await loadMessages();
-  buildMyOrder();
-  renderVoteList();
-  renderLeaderboard();
-  renderChat();
-  renderVoterCount();
-  if(pollTimer) clearInterval(pollTimer);
-  pollTimer = setInterval(refreshAll, 5000);
+  document.getElementById('whoami').innerHTML = `Signed in as <b>${escapeHtml(myName)}</b> · <a href="#" onclick="switchUser();return false;" style="color:var(--mango-500);">not you?</a>`;
+  await seedOptionsIfEmpty();
+
+  // Live: options list (resorts, including new suggestions)
+  db.ref('options').on('value', snap => {
+    const val = snap.val() || {};
+    optionsList = Object.values(val);
+    reconcileMyOrder();
+    renderVoteList();
+    renderLeaderboard();
+  });
+
+  // Live: everyone's votes (drives the leaderboard + voter count)
+  db.ref('votes').on('value', snap => {
+    const val = snap.val() || {};
+    votes = {};
+    Object.values(val).forEach(v => { if(v && v.name) votes[v.name] = v.order; });
+    if(!myOrder.length) buildMyOrder();
+    renderLeaderboard();
+    renderVoterCount();
+  });
+
+  // Live: chat
+  db.ref('messages').on('value', snap => {
+    const val = snap.val() || {};
+    messages = Object.values(val).sort((a,b)=>a.ts-b.ts);
+    renderChat();
+  });
 }
 </script>
 </body>
