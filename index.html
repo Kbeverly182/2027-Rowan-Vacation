@@ -70,14 +70,40 @@
 
   .hint{color: var(--sand-200); font-size:13.5px; margin: 0 0 18px; line-height:1.5;}
 
+  /* ---------- Disclaimer banner ---------- */
+  .disclaimer{
+    display:flex; gap:10px; align-items:flex-start;
+    background: var(--lagoon-900); border:1px solid var(--line); border-radius:10px;
+    padding: 12px 14px; margin-bottom:18px; font-size:12.5px; line-height:1.5; color: var(--sand-200);
+  }
+  .disclaimer .flag{flex-shrink:0; font-size:15px;}
+
   /* ---------- Postcards (options) ---------- */
   .card{
     position:relative;
     background: var(--sand-100); color: var(--ink);
-    border-radius: 14px; padding: 18px 18px 16px; margin-bottom: 14px;
+    border-radius: 14px; overflow:hidden; margin-bottom: 14px;
     border: 1px solid rgba(0,0,0,0.06);
     box-shadow: 0 10px 24px -14px rgba(0,0,0,0.5);
   }
+  .card-photo{
+    height: 108px; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 40px;
+  }
+  .card-photo .photo-label{
+    position:absolute; bottom:8px; left:12px;
+    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.05em;
+    color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.25); padding:2px 8px; border-radius:6px;
+  }
+  .card-body{padding: 16px 18px 16px;}
+  .price-block{
+    margin-top:12px; padding-top:12px; border-top: 1px dashed rgba(0,0,0,0.12);
+    display:flex; justify-content:space-between; align-items:flex-end; gap:10px; flex-wrap:wrap;
+  }
+  .price-block .price-total{font-family:'Fraunces', serif; font-weight:700; font-size:19px; color: var(--ink);}
+  .price-block .price-total span{font-family:'JetBrains Mono', monospace; font-weight:400; font-size:11px; color:#6b776f; display:block; margin-top:2px;}
+  .price-block .price-breakdown{font-family:'JetBrains Mono', monospace; font-size:11px; color:#6b776f; text-align:right; line-height:1.5;}
   .card .rank-badge{
     position:absolute; top:-10px; left:-10px;
     width:38px; height:38px; border-radius:50%;
@@ -218,6 +244,7 @@
   </div>
 
   <div id="panel-vote" class="panel active">
+    <div class="disclaimer"><span class="flag">✈</span><span>Prices are per person, double occupancy, for 5 nights + round-trip airfare — based on current published hotel rates and typical fares on this route, since airlines don't open 2027 bookings yet. Built on nonstop flights where they exist (Belize, Costa Rica both fly nonstop from EWR); actual cost will depend on your booking date. Treat these as ballpark, not quotes.</span></div>
     <p class="hint">Drag isn't reliable on every phone, so use the arrows — top of the list is your #1 pick. Hit save whenever you're happy with the order.</p>
     <div id="voteList"><div class="loading">Loading options…</div></div>
     <div class="save-bar"><button class="btn-primary" onclick="saveVote()">Save my ranking</button></div>
@@ -259,21 +286,31 @@ let myOrder = [];
 let pollTimer = null;
 
 const DEFAULT_OPTIONS = [
-  {id:'hamanasi', title:'Hamanasi', location:'Hopkins, Belize', tier:'$$$',
+  {id:'hamanasi', title:'Hamanasi', location:'Hopkins, Belize', tier:'$$$', url:'https://www.hamanasi.com/',
    desc:'Dive- and snorkel-focused resort on the Hopkins coast with guided excursions to the barrier reef and easy day trips into Cockscomb Basin rainforest.',
-   vibe:['snorkeling','rainforest day trips','beach','all-inclusive optional'], addedBy:'starter list'},
-  {id:'belizean-dreams', title:'Belizean Dreams', location:'Hopkins, Belize', tier:'$$',
+   vibe:['snorkeling','rainforest day trips','beach','all-inclusive optional'], addedBy:'starter list',
+   photo:'🐠', gradient:'linear-gradient(135deg,#0e6b63,#1a5750)',
+   price:{hotel:1130, flight:600, note:'room + breakfast, low season · flight is a UA nonstop estimate'}},
+  {id:'belizean-dreams', title:'Belizean Dreams', location:'Hopkins, Belize', tier:'$$', url:'https://www.belizeandreams.com/',
    desc:'Beachfront villas with a pool, spa, and Garifuna-inspired restaurant serving tropical drinks. Reef snorkel trips arranged through the front desk.',
-   vibe:['beach relaxation','drinks','villas for groups'], addedBy:'starter list'},
-  {id:'sirenian-bay', title:'Sirenian Bay Resort & Villas', location:'Placencia Peninsula, Belize', tier:'$$$',
+   vibe:['beach relaxation','drinks','villas for groups'], addedBy:'starter list',
+   photo:'🏖️', gradient:'linear-gradient(135deg,#e8a33d,#e2536b)',
+   price:{hotel:650, flight:600, note:'standard room, all-inclusive package · flight is a UA nonstop estimate'}},
+  {id:'sirenian-bay', title:'Sirenian Bay Resort & Villas', location:'Placencia Peninsula, Belize', tier:'$$$', url:'https://sirenianbayresort.com/',
    desc:'Secluded private beach and infinity pool, with access to both reef snorkeling and rainforest wildlife nearby. Villas work well for a group of 6+.',
-   vibe:['secluded','snorkeling','rainforest','villas'], addedBy:'starter list'},
-  {id:'ambergris-caye', title:'San Pedro / Ambergris Caye', location:'Ambergris Caye, Belize', tier:'$$',
-   desc:'Belize\'s top spot for reef snorkeling right off the barrier reef. Lively town, lots of beach bars — rainforest is a day-trip, not on-site.',
-   vibe:['best snorkeling','beach bars','island town'], addedBy:'starter list'},
-  {id:'manuel-antonio', title:'Manuel Antonio', location:'Puntarenas, Costa Rica', tier:'$$$',
+   vibe:['secluded','snorkeling','rainforest','villas'], addedBy:'starter list',
+   photo:'🌴', gradient:'linear-gradient(135deg,#1a5750,#0b2f2c)',
+   price:{hotel:1125, flight:600, note:'all-inclusive bungalow, based on comparable Placencia rates · flight is a UA nonstop estimate'}},
+  {id:'ambergris-caye', title:'Victoria House', location:'Ambergris Caye, Belize', tier:'$$$$', url:'https://www.victoria-house.com/',
+   desc:'Belize\'s top spot for reef snorkeling right off the barrier reef. Boutique beachfront resort with a lively town nearby — rainforest is a day-trip, not on-site.',
+   vibe:['best snorkeling','beach bars','island town'], addedBy:'starter list',
+   photo:'🤿', gradient:'linear-gradient(135deg,#1a90c9,#0e6b63)',
+   price:{hotel:1450, flight:600, note:'room + breakfast/dinner plan · flight is a UA nonstop estimate'}},
+  {id:'manuel-antonio', title:'Manuel Antonio', location:'Puntarenas, Costa Rica', tier:'$$', url:'https://www.google.com/travel/search?q=Manuel%20Antonio%20Costa%20Rica%20resorts',
    desc:'Rainforest meets beach right at the national park — monkeys and sloths on the trails, then straight into the water. Snorkeling is decent, not Belize-reef-level.',
-   vibe:['rainforest','beach','wildlife'], addedBy:'starter list'}
+   vibe:['rainforest','beach','wildlife'], addedBy:'starter list',
+   photo:'🦥', gradient:'linear-gradient(135deg,#3f6b4f,#1a5750)',
+   price:{hotel:750, flight:550, note:'mid-range beachfront resort · flight is a UA nonstop EWR–SJO estimate'}}
 ];
 
 function tabSwitch(name){
@@ -336,9 +373,15 @@ function renderVoteList(){
   el.innerHTML = myOrder.map((id, idx)=>{
     const o = optionsList.find(x=>x.id===id);
     if(!o) return '';
+    const total = o.price ? (o.price.hotel + o.price.flight) : null;
     return `
       <div class="card">
         <div class="rank-badge">${idx+1}</div>
+        <div class="card-photo" style="background:${o.gradient || 'linear-gradient(135deg,#1a5750,#0b2f2c)'}">
+          ${o.photo || '📍'}
+          <span class="photo-label">illustrative · <a href="${o.url || '#'}" target="_blank" rel="noopener" style="color:inherit;">real photos ↗</a></span>
+        </div>
+        <div class="card-body">
         <div class="card-top">
           <div>
             <h3>${escapeHtml(o.title)}</h3>
@@ -348,12 +391,18 @@ function renderVoteList(){
         </div>
         <p class="desc">${escapeHtml(o.desc)}</p>
         <div class="vibe-tags">${o.vibe.map(v=>`<span class="vibe-tag">${escapeHtml(v)}</span>`).join('')}</div>
+        ${total ? `
+        <div class="price-block">
+          <div class="price-total">$${total.toLocaleString()}<span>per person, estimate</span></div>
+          <div class="price-breakdown">$${o.price.hotel.toLocaleString()} hotel · $${o.price.flight.toLocaleString()} flight<br>${escapeHtml(o.price.note)}</div>
+        </div>` : ''}
         <div class="reorder">
           <button onclick="moveOption(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
           <button onclick="moveOption(${idx},1)" ${idx===myOrder.length-1?'disabled':''}>↓</button>
           <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6b776f;">move rank</span>
         </div>
         ${o.addedBy && o.addedBy!=='starter list' ? `<div class="added-by">suggested by ${escapeHtml(o.addedBy)}</div>` : ''}
+        </div>
       </div>`;
   }).join('');
 }
@@ -400,16 +449,18 @@ function renderLeaderboard(){
   const {scores, voterCounts} = computeScores();
   const maxScore = Math.max(1, ...optionsList.map(o=>scores[o.id]||0));
   const sorted = [...optionsList].sort((a,b)=>(scores[b.id]||0)-(scores[a.id]||0));
-  el.innerHTML = sorted.map((o, idx)=>`
+  el.innerHTML = sorted.map((o, idx)=>{
+    const total = o.price ? (o.price.hotel + o.price.flight) : null;
+    return `
     <div class="lb-row">
       <div class="lb-rank">${idx+1}</div>
       <div class="lb-info">
         <h4>${escapeHtml(o.title)}</h4>
-        <div class="lb-loc">${escapeHtml(o.location)} · ${escapeHtml(o.tier)}</div>
+        <div class="lb-loc">${escapeHtml(o.location)} · ${escapeHtml(o.tier)}${total ? ' · ~$'+total.toLocaleString()+'/person' : ''}</div>
         <div class="bar-track"><div class="bar-fill" style="width:${((scores[o.id]||0)/maxScore*100)}%"></div></div>
       </div>
       <div class="lb-score"><b>${scores[o.id]||0}</b>${voterCounts[o.id]||0} voter${(voterCounts[o.id]||0)===1?'':'s'}</div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 
 function renderVoterCount(){
