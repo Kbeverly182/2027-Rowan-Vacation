@@ -283,20 +283,15 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script>
 // ---- PASTE YOUR FIREBASE CONFIG HERE (see setup instructions) ----
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCz0GAfQn_Ew7bqxqNJ4NYxJWJ7OlR-nwk",
-  authDomain: "rowan-vacation-2027.firebaseapp.com",
-  databaseURL: "https://rowan-vacation-2027-default-rtdb.firebaseio.com",
-  projectId: "rowan-vacation-2027",
-  storageBucket: "rowan-vacation-2027.firebasestorage.app",
-  messagingSenderId: "2192185979",
-  appId: "1:2192185979:web:7c778947dad45f2c8e60de"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
-
 const FIREBASE_NOT_CONFIGURED = firebaseConfig.apiKey === "YOUR_API_KEY";
 let db = null;
 if(!FIREBASE_NOT_CONFIGURED){
@@ -315,27 +310,58 @@ const DEFAULT_OPTIONS = [
    desc:'Dive- and snorkel-focused resort on the Hopkins coast with guided excursions to the barrier reef and easy day trips into Cockscomb Basin rainforest.',
    vibe:['snorkeling','rainforest day trips','beach','all-inclusive optional'], addedBy:'starter list',
    photo:'🐠', gradient:'linear-gradient(135deg,#0e6b63,#1a5750)',
-   price:{hotel:1130, flight:600, note:'room + breakfast, low season · flight is a UA nonstop estimate'}},
+   price:{hotel:1130, flight:680, note:'room + breakfast, low season · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Hamanasi+Belize&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
   {id:'belizean-dreams', title:'Belizean Dreams', location:'Hopkins, Belize', tier:'$$', url:'https://www.belizeandreams.com/',
    desc:'Beachfront villas with a pool, spa, and Garifuna-inspired restaurant serving tropical drinks. Reef snorkel trips arranged through the front desk.',
    vibe:['beach relaxation','drinks','villas for groups'], addedBy:'starter list',
    photo:'🏖️', gradient:'linear-gradient(135deg,#e8a33d,#e2536b)',
-   price:{hotel:650, flight:600, note:'standard room, all-inclusive package · flight is a UA nonstop estimate'}},
+   price:{hotel:650, flight:680, note:'standard room, all-inclusive package · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Belizean+Dreams+Resort&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
   {id:'sirenian-bay', title:'Sirenian Bay Resort & Villas', location:'Placencia Peninsula, Belize', tier:'$$$', url:'https://sirenianbayresort.com/',
    desc:'Secluded private beach and infinity pool, with access to both reef snorkeling and rainforest wildlife nearby. Villas work well for a group of 6+.',
    vibe:['secluded','snorkeling','rainforest','villas'], addedBy:'starter list',
    photo:'🌴', gradient:'linear-gradient(135deg,#1a5750,#0b2f2c)',
-   price:{hotel:1125, flight:600, note:'all-inclusive bungalow, based on comparable Placencia rates · flight is a UA nonstop estimate'}},
+   price:{hotel:1125, flight:680, note:'all-inclusive bungalow, based on comparable Placencia rates · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Sirenian+Bay+Resort+Placencia&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
   {id:'ambergris-caye', title:'Victoria House', location:'Ambergris Caye, Belize', tier:'$$$$', url:'https://www.victoria-house.com/',
    desc:'Belize\'s top spot for reef snorkeling right off the barrier reef. Boutique beachfront resort with a lively town nearby — rainforest is a day-trip, not on-site.',
    vibe:['best snorkeling','beach bars','island town'], addedBy:'starter list',
    photo:'🤿', gradient:'linear-gradient(135deg,#1a90c9,#0e6b63)',
-   price:{hotel:1450, flight:600, note:'room + breakfast/dinner plan · flight is a UA nonstop estimate'}},
+   price:{hotel:1450, flight:680, note:'room + breakfast/dinner plan · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Victoria+House+Ambergris+Caye&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
   {id:'manuel-antonio', title:'Manuel Antonio', location:'Puntarenas, Costa Rica', tier:'$$', url:'https://www.google.com/travel/search?q=Manuel%20Antonio%20Costa%20Rica%20resorts',
    desc:'Rainforest meets beach right at the national park — monkeys and sloths on the trails, then straight into the water. Snorkeling is decent, not Belize-reef-level.',
    vibe:['rainforest','beach','wildlife'], addedBy:'starter list',
    photo:'🦥', gradient:'linear-gradient(135deg,#3f6b4f,#1a5750)',
-   price:{hotel:750, flight:550, note:'mid-range beachfront resort · flight is a UA nonstop EWR–SJO estimate'}}
+   price:{hotel:750, flight:580, note:'mid-range beachfront resort · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20San%20Jose%20Costa%20Rica%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Manuel+Antonio+Costa+Rica&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
+  {id:'rio-grande', title:'Rio Grande', location:'El Yunque area, Puerto Rico', tier:'$$$', url:'https://www.google.com/travel/search?q=Rio%20Grande%20Puerto%20Rico%20resorts%20El%20Yunque',
+   desc:'The only option here with an actual literal rainforest on-site — El Yunque National Forest is minutes away, plus beach and reef snorkeling day trips to Fajardo/Culebra. No passport needed for US citizens, which simplifies things for a group this size.',
+   vibe:['real rainforest','beach','snorkeling day trips','no passport needed'], addedBy:'starter list',
+   photo:'🌿', gradient:'linear-gradient(135deg,#2d8659,#0b2f2c)',
+   price:{hotel:1200, flight:400, note:'mid-upscale beach/golf resort · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20San%20Juan%20Puerto%20Rico%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Rio+Grande+Puerto+Rico+beach+resort&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
+  {id:'montego-bay', title:'Montego Bay / Negril', location:'Jamaica', tier:'$$', url:'https://www.google.com/travel/search?q=Montego%20Bay%20Jamaica%20all%20inclusive%20resorts',
+   desc:'The classic all-inclusive drinks-and-beach trip, with Dunn\'s River Falls (a literal waterfall you climb through jungle) as an easy day trip. Reef snorkeling is good, not world-class. Huge resort selection for a group this size.',
+   vibe:['all-inclusive','drinks','beach','waterfall day trip'], addedBy:'starter list',
+   photo:'🎶', gradient:'linear-gradient(135deg,#f2c14e,#2d8659)',
+   price:{hotel:1100, flight:450, note:'all-inclusive resort, double occupancy · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Montego%20Bay%20Jamaica%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Montego+Bay+Jamaica+all+inclusive&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'},
+  {id:'punta-cana', title:'Punta Cana', location:'La Altagracia, Dominican Republic', tier:'$', url:'https://www.google.com/travel/search?q=Punta%20Cana%20all%20inclusive%20resorts',
+   desc:'The Caribbean\'s biggest all-inclusive resort market, so it\'s the budget-friendliest option here by a wide margin. Beach and snorkeling are solid; rainforest isn\'t really a thing here, though there are eco-park day trips.',
+   vibe:['budget-friendly','all-inclusive','beach','snorkeling'], addedBy:'starter list',
+   photo:'🍹', gradient:'linear-gradient(135deg,#e2536b,#1a90c9)',
+   price:{hotel:625, flight:580, note:'all-inclusive resort, double occupancy · flight refreshed Aug 2026'},
+   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Punta%20Cana%20July%206%202027%20returning%20July%2011%202027',
+   hotelSearch:'https://www.booking.com/searchresults.html?ss=Punta+Cana+all+inclusive&checkin=2027-07-06&checkout=2027-07-11&group_adults=2'}
 ];
 
 function tabSwitch(name){
@@ -383,10 +409,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function seedOptionsIfEmpty(){
   const snap = await db.ref('options').once('value');
-  if(!snap.exists()){
-    const seed = {};
-    DEFAULT_OPTIONS.forEach(o => seed[o.id] = o);
-    await db.ref('options').set(seed);
+  const existing = snap.val() || {};
+  const updates = {};
+  DEFAULT_OPTIONS.forEach(o => { if(!existing[o.id]) updates[o.id] = o; });
+  if(Object.keys(updates).length){
+    await db.ref('options').update(updates);
   }
 }
 
@@ -434,7 +461,7 @@ function renderVoteList(){
         ${total ? `
         <div class="price-block">
           <div class="price-total">$${total.toLocaleString()}<span>per person, estimate</span></div>
-          <div class="price-breakdown">$${o.price.hotel.toLocaleString()} hotel · $${o.price.flight.toLocaleString()} flight<br>${escapeHtml(o.price.note)}</div>
+          <div class="price-breakdown">$${o.price.hotel.toLocaleString()} hotel · $${o.price.flight.toLocaleString()} flight<br>${escapeHtml(o.price.note)}<br>${o.flightSearch ? `<a href="${o.flightSearch}" target="_blank" rel="noopener" style="color:#1a5750;">check flights ↗</a>` : ''}${o.flightSearch && o.hotelSearch ? ' · ' : ''}${o.hotelSearch ? `<a href="${o.hotelSearch}" target="_blank" rel="noopener" style="color:#1a5750;">check hotel ↗</a>` : ''}</div>
         </div>` : ''}
         <div class="reorder">
           <button onclick="moveOption(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
