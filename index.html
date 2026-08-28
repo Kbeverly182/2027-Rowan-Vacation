@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Where To, Crew? — Trip Vote</title>
+<title>Rowan Vacation 2027 — Pick Your Lodging</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -31,10 +31,9 @@
     min-height:100vh;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap{max-width: 780px; margin: 0 auto; padding: 28px 18px 80px;}
+  .wrap{max-width: 800px; margin: 0 auto; padding: 28px 18px 100px;}
 
-  /* ---------- Hero ---------- */
-  .hero{padding: 8px 4px 26px; border-bottom: 1px dashed var(--line); margin-bottom: 22px;}
+  .hero{padding: 8px 4px 20px; border-bottom: 1px dashed var(--line); margin-bottom: 22px;}
   .eyebrow{
     font-family:'JetBrains Mono', monospace;
     font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
@@ -43,42 +42,37 @@
   .eyebrow::before{content:"✈"; font-size:14px;}
   h1{
     font-family:'Fraunces', serif; font-weight:700; font-optical-sizing:auto;
-    font-size: clamp(34px, 8vw, 52px); line-height: 1.02; margin: 0 0 12px;
+    font-size: clamp(32px, 7vw, 46px); line-height: 1.05; margin: 0 0 12px;
     letter-spacing: -0.01em;
   }
-  .hero p{margin:0; color: var(--sand-200); font-size:15px; line-height:1.55; max-width:52ch;}
-  .hero .meta{
-    display:flex; flex-wrap:wrap; gap: 10px 22px; margin-top:16px;
-    font-family:'JetBrains Mono', monospace; font-size: 12.5px; color: var(--sand-200);
+  #whoami{font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sand-200); margin-top:12px;}
+
+  h2.section-title{
+    font-family:'Fraunces', serif; font-size:22px; font-weight:600; margin: 30px 0 6px;
   }
-  .hero .meta span b{color:var(--sand-100); font-weight:500;}
-
-  /* ---------- Tabs (boarding-pass stubs) ---------- */
-  .tabs{display:flex; gap:8px; margin: 22px 0 24px; overflow-x:auto; padding-bottom:2px;}
-  .tab{
-    font-family:'JetBrains Mono', monospace; font-size:12.5px; letter-spacing:.04em;
-    background: var(--lagoon-900); border:1px solid var(--line); color: var(--sand-200);
-    padding: 10px 16px; border-radius: 999px; cursor:pointer; white-space:nowrap;
-    transition: all .15s ease;
+  .directions, .notes{
+    background: var(--lagoon-900); border:1px solid var(--line); border-radius:12px;
+    padding: 16px 18px; margin-bottom: 6px; font-size:14px; line-height:1.6; color: var(--sand-200);
   }
-  .tab.active{ background: var(--mango-500); color: var(--lagoon-950); border-color:var(--mango-500); font-weight:600;}
-  .tab:hover:not(.active){border-color: var(--mango-500); color: var(--sand-100);}
+  .notes ul{margin:8px 0 0; padding-left:20px;}
+  .notes li{margin-bottom:6px;}
+  .notes li ul{margin-top:4px;}
 
-  .panel{display:none;}
-  .panel.active{display:block; animation: fadein .25s ease;}
-  @keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
-
-  .hint{color: var(--sand-200); font-size:13.5px; margin: 0 0 18px; line-height:1.5;}
-
-  /* ---------- Disclaimer banner ---------- */
-  .disclaimer{
-    display:flex; gap:10px; align-items:flex-start;
-    background: var(--lagoon-900); border:1px solid var(--line); border-radius:10px;
-    padding: 12px 14px; margin-bottom:18px; font-size:12.5px; line-height:1.5; color: var(--sand-200);
+  /* ---------- Preference bubbles ---------- */
+  .bubble-row{display:flex; flex-wrap:wrap; gap:10px; margin: 16px 0 8px;}
+  .bubble{
+    font-family:'Inter', sans-serif; font-size:13.5px; font-weight:500;
+    background: var(--lagoon-900); border:1.5px solid var(--line); color: var(--sand-100);
+    padding: 10px 18px; border-radius: 999px; cursor:pointer; transition: all .15s ease;
+    user-select:none;
   }
-  .disclaimer .flag{flex-shrink:0; font-size:15px;}
+  .bubble:hover:not(.disabled){border-color: var(--mango-500);}
+  .bubble.active{ background: var(--mango-500); color: var(--lagoon-950); border-color:var(--mango-500); font-weight:600;}
+  .bubble.disabled{ opacity:0.3; cursor:not-allowed; text-decoration: line-through;}
 
-  /* ---------- Postcards (options) ---------- */
+  .count-note{font-family:'JetBrains Mono', monospace; font-size:12.5px; color: var(--mango-500); margin: 16px 0 4px;}
+
+  /* ---------- Lodging cards ---------- */
   .card{
     position:relative;
     background: var(--sand-100); color: var(--ink);
@@ -87,110 +81,51 @@
     box-shadow: 0 10px 24px -14px rgba(0,0,0,0.5);
   }
   .card-photo{
-    height: 108px; position:relative;
-    display:flex; align-items:center; justify-content:center;
-    font-size: 40px;
+    height: 64px; position:relative; display:flex; align-items:center; padding: 0 18px;
+    font-size: 28px; gap:12px;
   }
-  .card-photo .photo-label{
-    position:absolute; bottom:8px; left:12px;
-    font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:.05em;
-    color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.25); padding:2px 8px; border-radius:6px;
-  }
-  .card-body{padding: 16px 18px 16px;}
-  .price-block{
-    margin-top:12px; padding-top:12px; border-top: 1px dashed rgba(0,0,0,0.12);
-    display:flex; justify-content:space-between; align-items:flex-end; gap:10px; flex-wrap:wrap;
-  }
-  .price-block .price-total{font-family:'Fraunces', serif; font-weight:700; font-size:19px; color: var(--ink);}
-  .price-block .price-total span{font-family:'JetBrains Mono', monospace; font-weight:400; font-size:11px; color:#6b776f; display:block; margin-top:2px;}
-  .price-block .price-breakdown{font-family:'JetBrains Mono', monospace; font-size:11px; color:#6b776f; text-align:right; line-height:1.5;}
-  .card .rank-badge{
-    position:absolute; top:-10px; left:-10px;
-    width:38px; height:38px; border-radius:50%;
-    background: var(--lagoon-950); color: var(--mango-500);
-    border: 2px dashed var(--mango-500);
-    display:flex; align-items:center; justify-content:center;
-    font-family:'JetBrains Mono', monospace; font-weight:600; font-size:14px;
-  }
+  .card-body{padding: 14px 18px 16px;}
   .card-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
-  .card h3{font-family:'Fraunces', serif; font-size:20px; margin:0 0 3px; font-weight:600;}
-  .card .loc{font-size:12.5px; color:#4a5a52; font-family:'JetBrains Mono', monospace;}
-  .tier{
-    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.06em;
-    padding: 3px 9px; border-radius: 999px; white-space:nowrap; height:fit-content;
-    background: var(--lagoon-800); color: var(--sand-100);
-  }
-  .card p.desc{font-size:13.5px; line-height:1.5; margin: 10px 0 12px; color:#33413b;}
-  .card .vibe-tags{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
-  .vibe-tag{
+  .card h3{font-family:'Fraunces', serif; font-size:19px; margin:0 0 3px; font-weight:600;}
+  .card .loc{font-size:12px; color:#4a5a52; font-family:'JetBrains Mono', monospace;}
+  .tag-row{display:flex; flex-wrap:wrap; gap:6px; margin: 8px 0 10px;}
+  .tag{
     font-size:11px; font-family:'JetBrains Mono', monospace;
-    background: var(--sand-200); padding: 3px 8px; border-radius:6px; color:#4a5a52;
+    background: var(--sand-200); padding: 3px 9px; border-radius:6px; color:#4a5a52;
   }
-  .reorder{display:flex; gap:8px; align-items:center;}
-  .reorder button{
-    border:1px solid rgba(0,0,0,0.15); background:white; color:var(--ink);
-    width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:15px; line-height:1;
+  .card p.desc{font-size:13.5px; line-height:1.5; margin: 8px 0 12px; color:#33413b;}
+  .price-block{
+    padding-top:10px; border-top: 1px dashed rgba(0,0,0,0.12);
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
   }
-  .reorder button:disabled{opacity:.25; cursor:default;}
-  .reorder button:hover:not(:disabled){background: var(--sand-200);}
-  .added-by{font-size:11px; color:#6b776f; margin-top:4px; font-style:italic;}
+  .price-total{font-family:'Fraunces', serif; font-weight:700; font-size:19px; color: var(--ink);}
+  .price-total span{font-family:'JetBrains Mono', monospace; font-weight:400; font-size:11px; color:#6b776f; display:block; margin-top:2px;}
+  .price-link a{font-family:'JetBrains Mono', monospace; font-size:11px; color:#1a5750;}
 
-  .save-bar{
-    position:sticky; bottom:14px; margin-top:18px; display:flex; justify-content:center;
+  .rank-row{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .rank-btn{
+    font-family:'Inter', sans-serif; font-size:13px; font-weight:600;
+    border: 1.5px solid rgba(0,0,0,0.15); background:white; color:var(--ink);
+    padding: 8px 14px; border-radius: 999px; cursor:pointer;
   }
+  .rank-btn.picked{background: var(--hibiscus-500); border-color: var(--hibiscus-500); color:white;}
+  .sole-pick{
+    margin-top:12px; font-family:'JetBrains Mono', monospace; font-size:12.5px;
+    color:#1a5750; background:#e6f2ef; padding:8px 12px; border-radius:8px; display:inline-block;
+  }
+
+  .empty{color:var(--sand-200); font-size:13.5px; font-style:italic; padding: 24px 4px; text-align:center;}
+
+  .submit-bar{ position:sticky; bottom:14px; display:flex; flex-direction:column; align-items:center; margin-top:22px; gap:10px;}
   .btn-primary{
     font-family:'Inter', sans-serif; font-weight:600; font-size:14.5px;
     background: var(--hibiscus-500); color:white; border:none;
     padding: 13px 28px; border-radius: 999px; cursor:pointer;
     box-shadow: 0 10px 24px -8px rgba(226,83,107,0.6);
   }
-  .btn-primary:hover{filter:brightness(1.06);}
-  .btn-primary:active{transform: translateY(1px);}
-  .saved-note{
-    text-align:center; font-family:'JetBrains Mono', monospace; font-size:12px;
-    color: var(--mango-500); margin-top:10px; min-height:16px;
-  }
-
-  /* ---------- Leaderboard ---------- */
-  .lb-row{
-    display:flex; align-items:center; gap:14px; padding: 14px 4px;
-    border-bottom: 1px dashed var(--line);
-  }
-  .lb-rank{
-    font-family:'Fraunces', serif; font-size:26px; font-weight:700; color: var(--mango-500);
-    width:36px; text-align:center; flex-shrink:0;
-  }
-  .lb-info{flex:1;}
-  .lb-info h4{margin:0 0 2px; font-family:'Fraunces', serif; font-size:17px; font-weight:600; color:var(--sand-100);}
-  .lb-info .lb-loc{font-size:12px; color:var(--sand-200); font-family:'JetBrains Mono', monospace;}
-  .lb-score{text-align:right; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sand-200); flex-shrink:0;}
-  .lb-score b{display:block; font-size:18px; color:var(--sand-100);}
-  .bar-track{height:4px; background:var(--lagoon-800); border-radius:2px; margin-top:8px; overflow:hidden;}
-  .bar-fill{height:100%; background: linear-gradient(90deg, var(--mango-500), var(--hibiscus-500));}
-
-  /* ---------- Suggest form ---------- */
-  .form-field{margin-bottom:14px;}
-  .form-field label{
-    display:block; font-family:'JetBrains Mono', monospace; font-size:11.5px;
-    letter-spacing:.05em; text-transform:uppercase; color: var(--mango-500); margin-bottom:6px;
-  }
-  .form-field input, .form-field textarea, .form-field select{
-    width:100%; background: var(--lagoon-900); border:1px solid var(--line);
-    color: var(--sand-100); padding: 11px 13px; border-radius:8px;
-    font-family:'Inter',sans-serif; font-size:14px;
-  }
-  .form-field textarea{resize:vertical; min-height:64px;}
-  .form-field input::placeholder, .form-field textarea::placeholder{color:#6d8079;}
-
-  /* ---------- Chat ---------- */
-  .chat-log{max-height: 46vh; overflow-y:auto; margin-bottom:16px; padding-right:2px;}
-  .msg{margin-bottom: 14px;}
-  .msg .msg-head{display:flex; gap:8px; align-items:baseline; margin-bottom:3px;}
-  .msg .msg-name{font-weight:600; font-size:13.5px; color: var(--mango-500);}
-  .msg .msg-time{font-family:'JetBrains Mono', monospace; font-size:10.5px; color:#6d8079;}
-  .msg .msg-text{font-size:14px; line-height:1.5; color:var(--sand-100); background:var(--lagoon-900); padding:9px 12px; border-radius:0 10px 10px 10px; display:inline-block; border:1px solid var(--line);}
-  .chat-input-row{display:flex; gap:8px;}
-  .chat-input-row input[type=text]{flex:1;}
+  .btn-primary:disabled{opacity:.4; cursor:not-allowed; box-shadow:none;}
+  .btn-primary:hover:not(:disabled){filter:brightness(1.06);}
+  .saved-note{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:12.5px; color: var(--mango-500); min-height:16px;}
 
   /* ---------- Name gate ---------- */
   .gate{
@@ -208,8 +143,26 @@
     width:100%; padding:12px 14px; border-radius:8px; border:1px solid rgba(0,0,0,0.15);
     font-size:15px; margin-bottom:14px; font-family:'Inter',sans-serif;
   }
-  .empty{color:var(--sand-200); font-size:13.5px; font-style:italic; padding: 20px 4px;}
-  .loading{color:var(--sand-200); font-size:13px; font-family:'JetBrains Mono', monospace;}
+
+  /* ---------- Joke popup ---------- */
+  .joke-overlay{
+    position:fixed; inset:0; background: rgba(7,33,31,0.85); backdrop-filter: blur(4px);
+    display:none; align-items:center; justify-content:center; z-index:60; padding:20px;
+  }
+  .joke-overlay.show{display:flex;}
+  .joke-card{
+    background: var(--sand-100); color:var(--ink); border-radius:16px; padding:30px 26px;
+    max-width:360px; width:100%; text-align:center;
+  }
+  .joke-card .emoji{font-size:36px; margin-bottom:12px;}
+  .joke-card h2{font-family:'Fraunces', serif; font-size:22px; margin:0 0 10px;}
+  .joke-card p{font-size:14px; color:#4a5a52; margin:0 0 18px; line-height:1.5;}
+
+  /* ---------- Admin ---------- */
+  .admin-wrap{max-width:900px; margin:0 auto; padding:28px 18px;}
+  table.admin-table{width:100%; border-collapse:collapse; font-size:13px; margin-top:16px;}
+  table.admin-table th, table.admin-table td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--line);}
+  table.admin-table th{font-family:'JetBrains Mono', monospace; color:var(--mango-500); font-size:11.5px; text-transform:uppercase;}
 </style>
 </head>
 <body>
@@ -218,64 +171,62 @@
   <div class="gate-card">
     <div class="plane">🧳</div>
     <h2>Who's this?</h2>
-    <p>Enter your name so the group can see your ranking and chat messages. No password — just be nice.</p>
+    <p>Enter your name so we can keep track of who's submitted their picks. Rankings are collected anonymously in the results — only used to prevent duplicate submissions.</p>
     <input id="nameInput" type="text" placeholder="e.g. Sam" maxlength="30">
-    <button class="btn-primary" style="width:100%" onclick="setName()">Join the trip</button>
+    <button class="btn-primary" style="width:100%" onclick="setName()">Continue</button>
   </div>
 </div>
 
-<div class="wrap">
+<div id="jokeOverlay" class="joke-overlay">
+  <div class="joke-card">
+    <div class="emoji">🫠</div>
+    <h2>Nothing left!</h2>
+    <p>Take another look at your filters... or find new friends! 😄</p>
+    <button class="btn-primary" onclick="document.getElementById('jokeOverlay').classList.remove('show')">Back to filters</button>
+  </div>
+</div>
+
+<div id="mainApp" class="wrap">
   <div class="hero">
-    <div class="eyebrow">Group trip · July 7–12, 2027</div>
-    <h1>Where To, Crew?</h1>
-    <p>This list includes a variety of options — not just in Belize, but a few other destinations too, in case one catches your eye. Rank the options by your own taste and budget, add one we missed, and hash it out in the chat.</p>
-    <div class="meta">
-      <span>👥 <b id="voterCount">…</b> voting</span>
-      <span>✈️ out of <b>PHL / EWR</b></span>
-      <span>💺 <b>Premium economy</b></span>
-    </div>
-    <div id="whoami" style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sand-200); margin-top:12px;"></div>
+    <div class="eyebrow">Rowan Vacation · July 7–12, 2027</div>
+    <h1>Pick Your Lodging</h1>
+    <div id="whoami"></div>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="vote">My Ranking</div>
-    <div class="tab" data-tab="leaderboard">Leaderboard</div>
-    <div class="tab" data-tab="suggest">Suggest a Spot</div>
-    <div class="tab" data-tab="chat">Chat</div>
+  <div class="directions">
+    Choose your preferences below to help filter lodging options that will fit your desires. As you select the attributes, certain lodging options will disappear from the page. Unclicking the attribute brings them back. If you don't care either way on any of the attributes, you don't have to click them at all and everything will be an option. Eventually you should be left with a list of accommodations that you'd be happy to stay at. Then label your top 3 (if there are 3 remaining) with a 1 for your favorite, and hit the submit button at the bottom. Results will be anonymously collected to help reach a consensus. Have fun!
   </div>
 
-  <div id="panel-vote" class="panel active">
-    <div class="disclaimer"><span class="flag">✈</span><span>Prices are per person, double occupancy, for 5 nights + round-trip airfare — based on current published hotel rates and typical fares on this route, since airlines don't open 2027 bookings yet. Built on nonstop flights where they exist (Belize, Costa Rica both fly nonstop from EWR); actual cost will depend on your booking date. Treat these as ballpark, not quotes.</span></div>
-    <p class="hint">Drag isn't reliable on every phone, so use the arrows — top of the list is your #1 pick. Hit save whenever you're happy with the order.</p>
-    <div id="voteList"><div class="loading">Loading options…</div></div>
-    <div class="save-bar"><button class="btn-primary" onclick="saveVote()">Save my ranking</button></div>
-    <div id="savedNote" class="saved-note"></div>
+  <h2 class="section-title">Notes</h2>
+  <div class="notes">
+    <ul>
+      <li>If staying on one of the islands/cayes, a flight/boat is needed to/from lodging as well as back to the mainland for jungle excursions, etc.
+        <ul>
+          <li>Flights run every hour and take about 20 min and cost around $88 each way. Includes 1 carry-on and 1 checked bag.</li>
+          <li>Boats are ~1.5 hours, roughly half the price, but sometimes experience choppy seas.</li>
+          <li>Hotels can typically help set these up.</li>
+        </ul>
+      </li>
+    </ul>
   </div>
 
-  <div id="panel-leaderboard" class="panel">
-    <p class="hint">Ranked by everyone's input combined — top pick gets the most points from each person, and it all adds up here. Updates as people vote.</p>
-    <div id="leaderboardList"><div class="loading">Loading…</div></div>
-  </div>
+  <h2 class="section-title">Choose Your Preferences</h2>
+  <div class="bubble-row" id="bubbleRow"></div>
 
-  <div id="panel-suggest" class="panel">
-    <p class="hint">Know a spot that fits (Belize, Caribbean, or Costa Rica)? Add it and it'll show up for everyone to rank.</p>
-    <div class="form-field"><label>Name of resort / area</label><input id="s-title" type="text" placeholder="e.g. Turtle Inn, Placencia"></div>
-    <div class="form-field"><label>Location</label><input id="s-loc" type="text" placeholder="e.g. Placencia, Belize"></div>
-    <div class="form-field"><label>Price tier</label>
-      <select id="s-tier"><option value="$">$ — Budget</option><option value="$$" selected>$$ — Mid-range</option><option value="$$$">$$$ — Upscale</option><option value="$$$$">$$$$ — Luxury</option></select>
-    </div>
-    <div class="form-field"><label>Why it fits</label><textarea id="s-desc" placeholder="Snorkeling nearby? Beach? Rainforest? All-inclusive? What's the vibe?"></textarea></div>
-    <button class="btn-primary" style="width:100%" onclick="submitSuggestion()">Add to the list</button>
-    <div id="suggestNote" class="saved-note"></div>
-  </div>
+  <div class="count-note" id="countNote"></div>
+  <div id="lodgingList"></div>
 
-  <div id="panel-chat" class="panel">
-    <div id="chatLog" class="chat-log"><div class="loading">Loading messages…</div></div>
-    <div class="chat-input-row">
-      <input id="chatInput" type="text" placeholder="Say something…" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
-      <button class="btn-primary" onclick="sendMessage()">Send</button>
-    </div>
+  <div class="submit-bar">
+    <button class="btn-primary" id="submitBtn" onclick="submitRanking()">Submit my picks</button>
+    <div class="saved-note" id="savedNote"></div>
   </div>
+</div>
+
+<div id="adminWrap" class="admin-wrap" style="display:none;">
+  <h1 style="font-family:'Fraunces',serif;">Admin: Submitted Rankings</h1>
+  <p style="font-family:'JetBrains Mono', monospace; font-size:12.5px; color:var(--sand-200);">Rowan Vacation 2027 — password protected, not meant to be shared with the group.</p>
+  <button class="btn-primary" id="csvBtn" onclick="downloadCsv()" style="margin-top:14px;">Download CSV</button>
+  <div id="adminTableWrap"></div>
 </div>
 
 <!-- Firebase gives this page a real shared database, so saves actually persist across everyone's devices -->
@@ -299,97 +250,184 @@ if(!FIREBASE_NOT_CONFIGURED){
   db = firebase.database();
 }
 
-let myName = null;
-let optionsList = [];
-let votes = {};
-let messages = [];
-let myOrder = [];
-
-const DEFAULT_OPTIONS = [
-  {id:'hamanasi', title:'Hamanasi', location:'Hopkins, Belize', tier:'$$$', url:'https://www.hamanasi.com/',
-   desc:'Dive- and snorkel-focused resort on the Hopkins coast with guided excursions to the barrier reef and easy day trips into Cockscomb Basin rainforest.',
-   vibe:['snorkeling','rainforest day trips','beach','all-inclusive optional'], addedBy:'starter list',
-   photo:'🐠', gradient:'linear-gradient(135deg,#0e6b63,#1a5750)',
-   price:{hotel:1130, flight:680, note:'room + breakfast, low season · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Hamanasi+Belize&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'belizean-dreams', title:'Belizean Dreams', location:'Hopkins, Belize', tier:'$$', url:'https://www.belizeandreams.com/',
-   desc:'Beachfront villas with a pool, spa, and Garifuna-inspired restaurant serving tropical drinks. Reef snorkel trips arranged through the front desk.',
-   vibe:['beach relaxation','drinks','villas for groups'], addedBy:'starter list',
-   photo:'🏖️', gradient:'linear-gradient(135deg,#e8a33d,#e2536b)',
-   price:{hotel:650, flight:680, note:'standard room, all-inclusive package · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Belizean+Dreams+Resort&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'sirenian-bay', title:'Sirenian Bay Resort & Villas', location:'Placencia Peninsula, Belize', tier:'$$$', url:'https://sirenianbayresort.com/',
-   desc:'Secluded private beach and infinity pool, with access to both reef snorkeling and rainforest wildlife nearby. Villas work well for a group of 6+.',
-   vibe:['secluded','snorkeling','rainforest','villas'], addedBy:'starter list',
-   photo:'🌴', gradient:'linear-gradient(135deg,#1a5750,#0b2f2c)',
-   price:{hotel:1125, flight:680, note:'all-inclusive bungalow, based on comparable Placencia rates · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Sirenian+Bay+Resort+Placencia&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'ambergris-caye', title:'Victoria House', location:'Ambergris Caye, Belize', tier:'$$$$', url:'https://www.victoria-house.com/',
-   desc:'Belize\'s top spot for reef snorkeling right off the barrier reef. Boutique beachfront resort with a lively town nearby — rainforest is a day-trip, not on-site.',
-   vibe:['best snorkeling','beach bars','island town'], addedBy:'starter list',
-   photo:'🤿', gradient:'linear-gradient(135deg,#1a90c9,#0e6b63)',
-   price:{hotel:1450, flight:680, note:'room + breakfast/dinner plan · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Victoria+House+Ambergris+Caye&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'manuel-antonio', title:'Manuel Antonio', location:'Puntarenas, Costa Rica', tier:'$$', url:'https://www.google.com/travel/search?q=Manuel%20Antonio%20Costa%20Rica%20resorts',
-   desc:'Rainforest meets beach right at the national park — monkeys and sloths on the trails, then straight into the water. Snorkeling is decent, not Belize-reef-level.',
-   vibe:['rainforest','beach','wildlife'], addedBy:'starter list',
-   photo:'🦥', gradient:'linear-gradient(135deg,#3f6b4f,#1a5750)',
-   price:{hotel:750, flight:580, note:'mid-range beachfront resort · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20San%20Jose%20Costa%20Rica%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Manuel+Antonio+Costa+Rica&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'rio-grande', title:'Rio Grande', location:'El Yunque area, Puerto Rico', tier:'$$$', url:'https://www.google.com/travel/search?q=Rio%20Grande%20Puerto%20Rico%20resorts%20El%20Yunque',
-   desc:'The only option here with an actual literal rainforest on-site — El Yunque National Forest is minutes away, plus beach and reef snorkeling day trips to Fajardo/Culebra. No passport needed for US citizens, which simplifies things for a group this size.',
-   vibe:['real rainforest','beach','snorkeling day trips','no passport needed'], addedBy:'starter list',
-   photo:'🌿', gradient:'linear-gradient(135deg,#2d8659,#0b2f2c)',
-   price:{hotel:1200, flight:400, note:'mid-upscale beach/golf resort · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20San%20Juan%20Puerto%20Rico%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Rio+Grande+Puerto+Rico+beach+resort&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'montego-bay', title:'Montego Bay / Negril', location:'Jamaica', tier:'$$', url:'https://www.google.com/travel/search?q=Montego%20Bay%20Jamaica%20all%20inclusive%20resorts',
-   desc:'The classic all-inclusive drinks-and-beach trip, with Dunn\'s River Falls (a literal waterfall you climb through jungle) as an easy day trip. Reef snorkeling is good, not world-class. Huge resort selection for a group this size.',
-   vibe:['all-inclusive','drinks','beach','waterfall day trip'], addedBy:'starter list',
-   photo:'🎶', gradient:'linear-gradient(135deg,#f2c14e,#2d8659)',
-   price:{hotel:1100, flight:450, note:'all-inclusive resort, double occupancy · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Montego%20Bay%20Jamaica%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Montego+Bay+Jamaica+all+inclusive&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'punta-cana', title:'Punta Cana', location:'La Altagracia, Dominican Republic', tier:'$', url:'https://www.google.com/travel/search?q=Punta%20Cana%20all%20inclusive%20resorts',
-   desc:'The Caribbean\'s biggest all-inclusive resort market, so it\'s the budget-friendliest option here by a wide margin. Beach and snorkeling are solid; rainforest isn\'t really a thing here, though there are eco-park day trips.',
-   vibe:['budget-friendly','all-inclusive','beach','snorkeling'], addedBy:'starter list',
-   photo:'🍹', gradient:'linear-gradient(135deg,#e2536b,#1a90c9)',
-   price:{hotel:625, flight:580, note:'all-inclusive resort, double occupancy · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Punta%20Cana%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Punta+Cana+all+inclusive&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'ramons-village', title:"Ramon's Village Resort", location:'San Pedro, Ambergris Caye, Belize', tier:'$', url:'https://ramons.com/',
-   desc:'Thatched-roof beachfront cabanas right in San Pedro town, steps from the barrier reef — the best value-for-snorkeling pick here by a wide margin. Walkable to town for food and drinks; less secluded than the other Belize picks.',
-   vibe:['budget-friendly','snorkeling','walkable town','beachfront'], addedBy:'starter list',
-   photo:'🏝️', gradient:'linear-gradient(135deg,#1a90c9,#1a5750)',
-   price:{hotel:525, flight:680, note:'room only, double occupancy · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Ramons+Village+Resort+San+Pedro&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'sunbreeze', title:'SunBreeze Hotel', location:'San Pedro, Ambergris Caye, Belize', tier:'$', url:'https://www.sunbreeze.net/',
-   desc:'Beachfront, right across from the San Pedro airstrip (easiest logistics of any option here), with an on-site PADI dive/snorkel center. Less resort-y feel than Hamanasi or Victoria House, more of a solid home base.',
-   vibe:['easiest logistics','snorkeling on-site','beachfront','budget-friendly'], addedBy:'starter list',
-   photo:'🐚', gradient:'linear-gradient(135deg,#e8a33d,#1a90c9)',
-   price:{hotel:625, flight:680, note:'room only, double occupancy · flight refreshed Aug 2026'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Belize%20City%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=SunBreeze+Hotel+San+Pedro&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'},
-  {id:'saint-lucia', title:'Coconut Bay Beach Resort', location:'Vieux Fort, Saint Lucia', tier:'$$$', url:'https://www.google.com/travel/search?q=Saint%20Lucia%20all%20inclusive%20resorts',
-   desc:"The only Caribbean option here with real mountainous rainforest (the Pitons, Sulphur Springs, zip-lining) alongside the beach — closer to a Belize-style mix than the other islands. All-inclusive, family-friendly, and flights run close to nonstop via United from EWR.",
-   vibe:['rainforest + mountains','all-inclusive','beach','snorkeling'], addedBy:'starter list',
-   photo:'⛰️', gradient:'linear-gradient(135deg,#2d8659,#1a90c9)',
-   price:{hotel:850, flight:480, note:'all-inclusive resort, double occupancy · flight refreshed Aug 2026, mostly-direct EWR routing'},
-   flightSearch:'https://www.google.com/travel/flights?q=Flights%20from%20Newark%20to%20Saint%20Lucia%20July%207%202027%20returning%20July%2012%202027',
-   hotelSearch:'https://www.booking.com/searchresults.html?ss=Coconut+Bay+Beach+Resort+Saint+Lucia&checkin=2027-07-07&checkout=2027-07-12&group_adults=2'}
+// ---- Lodging data ----
+// location: 'island' | 'mainland'    belizeCity: true only for the one Belize City listing
+// type: 'hotel' | 'airbnb'           queenPlus: false means double-bed-only rooms
+const LODGING_OPTIONS = [
+  {id:'sunbreeze', name:'SunBreeze Hotel', location:'island', belizeCity:false, type:'hotel', queenPlus:false,
+   loc:'San Pedro, Ambergris Caye', desc:'Beachfront, right across from the San Pedro airstrip — easiest logistics of any island option. On-site PADI dive/snorkel center.',
+   priceTotal:8519, url:'https://www.booking.com/Share-oN3N8G'},
+  {id:'tradewinds', name:'Tradewinds Paradise Villas', location:'island', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'San Pedro, Ambergris Caye', desc:'Villa-style units with private pool and full kitchen facilities, free parking.',
+   priceTotal:6100, url:'https://www.booking.com/'},
+  {id:'casa-redonda', name:'Casa Redonda', location:'island', belizeCity:false, type:'airbnb', queenPlus:true,
+   loc:'San Pedro, Ambergris Caye', desc:'Entire oceanfront villa, 8 bedrooms / 5 baths, sleeps 16+, thatched-roof cabana bar by the pool.',
+   priceTotal:7790, url:'https://www.airbnb.com/'},
+  {id:'two-luxury-villas', name:"Two Luxury Villas (9BR, 2 Pools)", location:'island', belizeCity:false, type:'airbnb', queenPlus:true,
+   loc:'San Pedro, Ambergris Caye', desc:'Two connected beachfront villas, 9 bedrooms, sleeps 16, two pools. 4.91★ Guest Favorite.',
+   priceTotal:8450, url:'https://www.airbnb.com/'},
+  {id:'casa-de-leon', name:'Casa De León', location:'mainland', belizeCity:false, type:'airbnb', queenPlus:true,
+   loc:'Hopkins', desc:'Entire beachfront home, 7 bedrooms / 6 baths, sleeps 16+, firepit and BBQ area.',
+   priceTotal:5679, url:'https://www.airbnb.com/'},
+  {id:'almond-beach', name:'Almond Beach Resort at Jaguar Reef', location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'Hopkins', desc:'4 Deluxe Double Rooms with balcony and sea view, plus 3 Suites with private pool.',
+   priceTotal:8246, url:'https://www.booking.com/'},
+  {id:'parrot-cove', name:'Parrot Cove Lodge', location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'Belize (mainland)', desc:'Mix of Triple, Double, Ocean Front Deluxe, and Family rooms — breakfast included.',
+   priceTotal:7080, url:'https://www.booking.com/'},
+  {id:'seiri-del-mar', name:'Seiri del Mar', location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'Belize (mainland)', desc:'2 Standard Villas plus 1 Three-Bedroom Villa.',
+   priceTotal:9314, url:'https://www.booking.com/'},
+  {id:'hopkins-bay', name:"Hopkins Bay Belize, a Muy'Ono Resort", location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'Hopkins', desc:'7 One-Bedroom Villas, each with parking spot and high-speed internet included.',
+   priceTotal:7161, url:'https://www.booking.com/'},
+  {id:'ramons-village', name:"Ramon's Village Resort", location:'island', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'San Pedro, Ambergris Caye', desc:'Thatched-roof beachfront cabanas right in San Pedro town — best value-for-snorkeling pick, walkable to town.',
+   priceTotal:7650, url:'https://ramons.com/'},
+  {id:'tara-del-sol', name:'Tara Del Sol Resort', location:'island', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'San Pedro, Ambergris Caye', desc:'2 Two-Bedroom Ocean View Apartments plus 1 Luxury Three-Bedroom Villa. Cheapest option on the whole list.',
+   priceTotal:5435, url:'https://www.booking.com/'},
+  {id:'pelican-reef', name:'Pelican Reef Villas Resort', location:'island', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'San Pedro, Ambergris Caye', desc:'Two-bedroom King Suites — pool view, garden view, and beachfront view options.',
+   priceTotal:7189, url:'https://www.booking.com/'},
+  {id:'golden-bay', name:'Golden Bay Hotel by Marine Parade', location:'mainland', belizeCity:true, type:'hotel', queenPlus:true,
+   loc:'Belize City', desc:'3★ hotel rated "Very Good" (8.1), the only option here close to the international airport.',
+   priceTotal:5072, url:'https://www.expedia.com/'},
+  {id:'blue-reef', name:'Blue Reef Beach and Marina', location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'Belize (mainland)', desc:'Beachfront resort with marina and open-air dining, rated "Wonderful" (9.2).',
+   priceTotal:8290, url:'https://www.expedia.com/'}
 ];
 
-function tabSwitch(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+name));
+const BUBBLES = [
+  {id:'noPlanesBoats', label:'No planes/boats to get to lodging'},
+  {id:'closeAirport', label:'Close to airport'},
+  {id:'hotelOnly', label:'Hotel/Resort only (no Airbnb)', pairWith:'airbnbOnly'},
+  {id:'airbnbOnly', label:'Airbnb only (no Hotel/Resort)', pairWith:'hotelOnly'},
+  {id:'jungleAccess', label:'Easy access to jungle adventures'},
+  {id:'queenMin', label:'Queen size bed minimum (doubles are troubles)'},
+  {id:'islandOnly', label:'Island/Caye only'}
+];
+
+let myName = null;
+let filters = {};
+let myRanks = {1:null, 2:null, 3:null};
+
+function tag(t){
+  return {hotel:'Hotel/Resort', airbnb:'Airbnb', island:'Island/Caye', mainland:'Mainland'}[t] || t;
 }
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>tabSwitch(t.dataset.tab)));
+
+function computeVisible(){
+  return LODGING_OPTIONS.filter(o=>{
+    if(filters.noPlanesBoats && o.location === 'island') return false;
+    if(filters.closeAirport && !o.belizeCity) return false;
+    if(filters.hotelOnly && o.type !== 'hotel') return false;
+    if(filters.airbnbOnly && o.type !== 'airbnb') return false;
+    if(filters.jungleAccess && o.location === 'island') return false;
+    if(filters.queenMin && !o.queenPlus) return false;
+    if(filters.islandOnly && o.location !== 'island') return false;
+    return true;
+  });
+}
+
+function toggleBubble(id, pairWith){
+  if(!filters[id] && pairWith && filters[pairWith]){
+    filters[pairWith] = false; // clear the paired opposite first
+  }
+  filters[id] = !filters[id];
+  render();
+}
+
+function renderBubbles(){
+  const el = document.getElementById('bubbleRow');
+  el.innerHTML = BUBBLES.map(b=>{
+    const disabled = b.pairWith && filters[b.pairWith];
+    const active = filters[b.id];
+    return `<div class="bubble ${active?'active':''} ${disabled?'disabled':''}"
+      onclick="${disabled ? '' : `toggleBubble('${b.id}', ${b.pairWith ? `'${b.pairWith}'` : 'null'})`}">${escapeHtml(b.label)}</div>`;
+  }).join('');
+}
+
+function renderLodgingList(){
+  const visible = computeVisible();
+  document.getElementById('countNote').textContent =
+    visible.length === LODGING_OPTIONS.length
+      ? `Showing all ${LODGING_OPTIONS.length} options`
+      : `Showing ${visible.length} of ${LODGING_OPTIONS.length} options`;
+
+  const el = document.getElementById('lodgingList');
+  if(!visible.length){
+    el.innerHTML = '<div class="empty">Nothing matches these filters right now.</div>';
+    document.getElementById('submitBtn').disabled = true;
+    return;
+  }
+
+  // Clean up ranks pointing at now-hidden options
+  [1,2,3].forEach(r=>{
+    if(myRanks[r] && !visible.find(o=>o.id===myRanks[r])) myRanks[r] = null;
+  });
+
+  const maxRank = Math.min(3, visible.length);
+
+  el.innerHTML = visible.map(o=>{
+    const perCouple = Math.round(o.priceTotal / 7);
+    let rankHtml = '';
+    if(visible.length === 1){
+      rankHtml = `<div class="sole-pick">✓ This is the only option left — no ranking needed, it'll be recorded as your pick.</div>`;
+    } else {
+      const buttons = [];
+      for(let r=1; r<=maxRank; r++){
+        const picked = myRanks[r] === o.id;
+        const label = r===1?'1st':r===2?'2nd':'3rd';
+        buttons.push(`<button class="rank-btn ${picked?'picked':''}" onclick="setRank('${o.id}', ${r})">${picked?'✓ ':''}${label}</button>`);
+      }
+      rankHtml = `<div class="rank-row">${buttons.join('')}</div>`;
+    }
+    return `
+      <div class="card">
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <h3>${escapeHtml(o.name)}</h3>
+              <div class="loc">${escapeHtml(o.loc)}</div>
+            </div>
+          </div>
+          <div class="tag-row">
+            <span class="tag">${tag(o.location)}</span>
+            <span class="tag">${tag(o.type)}</span>
+            ${o.belizeCity ? '<span class="tag">Near airport</span>' : ''}
+          </div>
+          <p class="desc">${escapeHtml(o.desc)}</p>
+          <div class="price-block">
+            <div class="price-total">$${perCouple.toLocaleString()}<span>per couple · $${o.priceTotal.toLocaleString()} total for 7 rooms</span></div>
+            <div class="price-link"><a href="${o.url}" target="_blank" rel="noopener">view listing ↗</a></div>
+          </div>
+          ${rankHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('submitBtn').disabled = false;
+}
+
+function setRank(id, rank){
+  // toggle off if clicking the same assignment again
+  if(myRanks[rank] === id){ myRanks[rank] = null; }
+  else {
+    // remove this id from any other rank slot first
+    [1,2,3].forEach(r=>{ if(myRanks[r] === id) myRanks[r] = null; });
+    myRanks[rank] = id;
+  }
+  render();
+}
+
+function render(){
+  renderBubbles();
+  renderLodgingList();
+}
+
+function safeKey(name){
+  return encodeURIComponent(name.trim().toLowerCase()).replace(/[.#$/\[\]%]/g, '_');
+}
 
 function setName(){
   const val = document.getElementById('nameInput').value.trim();
@@ -406,18 +444,119 @@ function switchUser(){
   location.reload();
 }
 
-function safeKey(name){
-  return encodeURIComponent(name.trim().toLowerCase()).replace(/[.#$/\[\]%]/g, '_');
+async function submitRanking(){
+  const visible = computeVisible();
+  const note = document.getElementById('savedNote');
+  if(!visible.length){
+    document.getElementById('jokeOverlay').classList.add('show');
+    return;
+  }
+  let payload;
+  if(visible.length === 1){
+    payload = {top1: visible[0].id, top2: null, top3: null};
+  } else {
+    if(!myRanks[1]){
+      note.textContent = '⚠ Pick at least your #1 favorite before submitting.';
+      setTimeout(()=>note.textContent='', 3000);
+      return;
+    }
+    payload = {top1: myRanks[1], top2: myRanks[2], top3: myRanks[3]};
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try{
+    await db.ref('submissions/' + safeKey(myName)).set({
+      name: myName, top1: payload.top1, top2: payload.top2, top3: payload.top3, updatedAt: Date.now()
+    });
+    note.textContent = '✓ Submitted — thanks! You can change your picks and resubmit anytime.';
+  }catch(e){
+    note.textContent = '⚠ Could not submit (' + (e && e.message ? e.message : 'connection issue') + '). Try again.';
+  }
+  btn.disabled = false; btn.textContent = 'Submit my picks';
+  setTimeout(()=>{ note.textContent=''; }, 5000);
 }
 
-// On page load: skip the gate if we already know who this is; bail with a setup message if Firebase isn't configured yet
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+function init(){
+  document.getElementById('whoami').innerHTML = `Signed in as <b>${escapeHtml(myName)}</b> · <a href="#" onclick="switchUser();return false;" style="color:var(--mango-500);">not you?</a>`;
+  BUBBLES.forEach(b=>{ filters[b.id] = false; });
+  render();
+}
+
+// ---- Admin panel ----
+const ADMIN_PASSWORD = "RowanVacay27"; // change this to whatever you like
+let adminSubmissions = [];
+
+function lodgingName(id){
+  const o = LODGING_OPTIONS.find(x=>x.id===id);
+  return o ? o.name : (id ? id : '—');
+}
+
+async function initAdmin(){
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'none';
+  const pw = prompt('Admin password:');
+  if(pw !== ADMIN_PASSWORD){
+    document.body.innerHTML = '<div style="color:white; font-family:sans-serif; padding:40px; text-align:center;">Incorrect password.</div>';
+    return;
+  }
+  document.getElementById('adminWrap').style.display = 'block';
+  const snap = await db.ref('submissions').once('value');
+  const val = snap.val() || {};
+  adminSubmissions = Object.values(val);
+  const tableEl = document.getElementById('adminTableWrap');
+  if(!adminSubmissions.length){
+    tableEl.innerHTML = '<p style="color:var(--sand-200); font-family:JetBrains Mono, monospace;">No submissions yet.</p>';
+    return;
+  }
+  tableEl.innerHTML = `<table class="admin-table">
+    <thead><tr><th>Name</th><th>1st choice</th><th>2nd choice</th><th>3rd choice</th><th>Submitted</th></tr></thead>
+    <tbody>
+      ${adminSubmissions.map(s => `<tr>
+        <td>${escapeHtml(s.name||'')}</td>
+        <td>${escapeHtml(lodgingName(s.top1))}</td>
+        <td>${escapeHtml(lodgingName(s.top2))}</td>
+        <td>${escapeHtml(lodgingName(s.top3))}</td>
+        <td>${s.updatedAt ? new Date(s.updatedAt).toLocaleString() : ''}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function downloadCsv(){
+  const header = ['Name','1st Choice','2nd Choice','3rd Choice','Submitted At'];
+  const rows = adminSubmissions.map(s => [
+    s.name || '',
+    lodgingName(s.top1),
+    lodgingName(s.top2),
+    lodgingName(s.top3),
+    s.updatedAt ? new Date(s.updatedAt).toLocaleString() : ''
+  ]);
+  const csv = [header, ...rows].map(r =>
+    r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'rowan-vacation-rankings.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   if(FIREBASE_NOT_CONFIGURED){
     document.getElementById('gate').innerHTML = `<div class="gate-card">
       <div class="plane">🔧</div>
       <h2>One setup step left</h2>
-      <p>This site needs a free Firebase database plugged in before it can save anything. Open <code>index.html</code>, find the <code>firebaseConfig</code> object near the top of the script, and paste in your project's config. Ask Claude for the setup steps if you haven't done this yet.</p>
+      <p>This site needs a free Firebase database plugged in before it can save anything. Ask Claude for the setup steps if you haven't done this yet.</p>
     </div>`;
+    return;
+  }
+  if(new URLSearchParams(window.location.search).get('admin') === '1'){
+    initAdmin();
     return;
   }
   const savedName = localStorage.getItem('tripvote_name');
@@ -427,213 +566,6 @@ window.addEventListener('DOMContentLoaded', () => {
     init();
   }
 });
-
-async function seedOptionsIfEmpty(){
-  const snap = await db.ref('options').once('value');
-  const existing = snap.val() || {};
-  const updates = {};
-  DEFAULT_OPTIONS.forEach(o => { if(!existing[o.id]) updates[o.id] = o; });
-  if(Object.keys(updates).length){
-    await db.ref('options').update(updates);
-  }
-}
-
-function buildMyOrder(){
-  const ids = optionsList.map(o=>o.id);
-  if(votes[myName] && Array.isArray(votes[myName])){
-    const existing = votes[myName].filter(id=>ids.includes(id));
-    const missing = ids.filter(id=>!existing.includes(id));
-    myOrder = [...existing, ...missing];
-  } else {
-    myOrder = ids;
-  }
-}
-
-function reconcileMyOrder(){
-  const ids = optionsList.map(o=>o.id);
-  myOrder = myOrder.filter(id=>ids.includes(id));
-  ids.forEach(id=>{ if(!myOrder.includes(id)) myOrder.push(id); });
-}
-
-function renderVoteList(){
-  const el = document.getElementById('voteList');
-  if(!optionsList.length){ el.innerHTML = '<div class="empty">No options yet — add one in "Suggest a Spot".</div>'; return; }
-  el.innerHTML = myOrder.map((id, idx)=>{
-    const o = optionsList.find(x=>x.id===id);
-    if(!o) return '';
-    const total = o.price ? (o.price.hotel + o.price.flight) : null;
-    return `
-      <div class="card">
-        <div class="rank-badge">${idx+1}</div>
-        <div class="card-photo" style="background:${o.gradient || 'linear-gradient(135deg,#1a5750,#0b2f2c)'}">
-          ${o.photo || '📍'}
-          <span class="photo-label">illustrative · <a href="${o.url || '#'}" target="_blank" rel="noopener" style="color:inherit;">real photos ↗</a></span>
-        </div>
-        <div class="card-body">
-        <div class="card-top">
-          <div>
-            <h3>${escapeHtml(o.title)}</h3>
-            <div class="loc">${escapeHtml(o.location)}</div>
-          </div>
-          <div class="tier">${escapeHtml(o.tier)}</div>
-        </div>
-        <p class="desc">${escapeHtml(o.desc)}</p>
-        <div class="vibe-tags">${o.vibe.map(v=>`<span class="vibe-tag">${escapeHtml(v)}</span>`).join('')}</div>
-        ${total ? `
-        <div class="price-block">
-          <div class="price-total">$${total.toLocaleString()}<span>per person, estimate</span></div>
-          <div class="price-breakdown">$${o.price.hotel.toLocaleString()} hotel · $${o.price.flight.toLocaleString()} flight<br>${escapeHtml(o.price.note)}<br>${o.flightSearch ? `<a href="${o.flightSearch}" target="_blank" rel="noopener" style="color:#1a5750;">check flights ↗</a>` : ''}${o.flightSearch && o.hotelSearch ? ' · ' : ''}${o.hotelSearch ? `<a href="${o.hotelSearch}" target="_blank" rel="noopener" style="color:#1a5750;">check hotel ↗</a>` : ''}</div>
-        </div>` : ''}
-        <div class="reorder">
-          <button onclick="moveOption(${idx},-1)" ${idx===0?'disabled':''}>↑</button>
-          <button onclick="moveOption(${idx},1)" ${idx===myOrder.length-1?'disabled':''}>↓</button>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6b776f;">move rank</span>
-        </div>
-        ${o.addedBy && o.addedBy!=='starter list' ? `<div class="added-by">suggested by ${escapeHtml(o.addedBy)}</div>` : ''}
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function moveOption(idx, dir){
-  const newIdx = idx+dir;
-  if(newIdx<0 || newIdx>=myOrder.length) return;
-  [myOrder[idx], myOrder[newIdx]] = [myOrder[newIdx], myOrder[idx]];
-  renderVoteList();
-}
-
-async function saveVote(){
-  const note = document.getElementById('savedNote');
-  const btn = document.querySelector('.save-bar .btn-primary');
-  votes[myName] = myOrder;
-  btn.disabled = true; btn.textContent = 'Saving…';
-  try{
-    await db.ref('votes/' + safeKey(myName)).set({name: myName, order: myOrder, updatedAt: Date.now()});
-    note.textContent = '✓ Saved — visible to the whole group now.';
-  }catch(e){
-    note.textContent = '⚠ Could not save (' + (e && e.message ? e.message : 'connection issue') + '). Try again.';
-  }
-  btn.disabled = false; btn.textContent = 'Save my ranking';
-  setTimeout(()=>{ note.textContent=''; }, 4000);
-}
-
-function computeScores(){
-  const scores = {}; const voterCounts = {};
-  optionsList.forEach(o=>{ scores[o.id]=0; voterCounts[o.id]=0; });
-  const names = Object.keys(votes);
-  names.forEach(name=>{
-    const order = votes[name].filter(id=>optionsList.some(o=>o.id===id));
-    const n = order.length;
-    order.forEach((id, idx)=>{
-      scores[id] = (scores[id]||0) + (n - idx);
-      voterCounts[id] = (voterCounts[id]||0) + 1;
-    });
-  });
-  return {scores, voterCounts, voterTotal: names.length};
-}
-
-function renderLeaderboard(){
-  const el = document.getElementById('leaderboardList');
-  if(!optionsList.length){ el.innerHTML = '<div class="empty">Nothing to rank yet.</div>'; return; }
-  const {scores, voterCounts} = computeScores();
-  const maxScore = Math.max(1, ...optionsList.map(o=>scores[o.id]||0));
-  const sorted = [...optionsList].sort((a,b)=>(scores[b.id]||0)-(scores[a.id]||0));
-  el.innerHTML = sorted.map((o, idx)=>{
-    const total = o.price ? (o.price.hotel + o.price.flight) : null;
-    return `
-    <div class="lb-row">
-      <div class="lb-rank">${idx+1}</div>
-      <div class="lb-info">
-        <h4>${escapeHtml(o.title)}</h4>
-        <div class="lb-loc">${escapeHtml(o.location)} · ${escapeHtml(o.tier)}${total ? ' · ~$'+total.toLocaleString()+'/person' : ''}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${((scores[o.id]||0)/maxScore*100)}%"></div></div>
-      </div>
-      <div class="lb-score"><b>${scores[o.id]||0}</b>${voterCounts[o.id]||0} voter${(voterCounts[o.id]||0)===1?'':'s'}</div>
-    </div>`;}).join('');
-}
-
-function renderVoterCount(){
-  document.getElementById('voterCount').textContent = Object.keys(votes).length;
-}
-
-async function submitSuggestion(){
-  const title = document.getElementById('s-title').value.trim();
-  const loc = document.getElementById('s-loc').value.trim();
-  const tier = document.getElementById('s-tier').value;
-  const desc = document.getElementById('s-desc').value.trim();
-  const note = document.getElementById('suggestNote');
-  if(!title || !loc){ note.textContent = 'Add at least a name and location.'; setTimeout(()=>note.textContent='',2500); return; }
-  const id = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Date.now().toString(36);
-  const newOption = {id, title, location:loc, tier, desc: desc || 'No description yet.', vibe:[], addedBy: myName, photo:'📍', gradient:'linear-gradient(135deg,#1a5750,#0b2f2c)'};
-  try{
-    await db.ref('options/' + id).set(newOption);
-    note.textContent = '✓ Added — check "My Ranking" to place it.';
-    document.getElementById('s-title').value=''; document.getElementById('s-loc').value=''; document.getElementById('s-desc').value='';
-  }catch(e){
-    note.textContent = '⚠ Could not save — try again.';
-  }
-  setTimeout(()=>{ note.textContent=''; }, 3000);
-}
-
-function renderChat(){
-  const el = document.getElementById('chatLog');
-  if(!messages.length){ el.innerHTML = '<div class="empty">No messages yet — say hi.</div>'; return; }
-  el.innerHTML = messages.map(m=>`
-    <div class="msg">
-      <div class="msg-head"><span class="msg-name">${escapeHtml(m.name)}</span><span class="msg-time">${formatTime(m.ts)}</span></div>
-      <div class="msg-text">${escapeHtml(m.text)}</div>
-    </div>`).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-async function sendMessage(){
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if(!text) return;
-  try{
-    await db.ref('messages').push({name: myName, text, ts: Date.now()});
-    input.value='';
-  }catch(e){}
-}
-
-function formatTime(ts){
-  const d = new Date(ts);
-  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-}
-function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
-}
-
-async function init(){
-  document.getElementById('whoami').innerHTML = `Signed in as <b>${escapeHtml(myName)}</b> · <a href="#" onclick="switchUser();return false;" style="color:var(--mango-500);">not you?</a>`;
-  await seedOptionsIfEmpty();
-
-  // Live: options list (resorts, including new suggestions)
-  db.ref('options').on('value', snap => {
-    const val = snap.val() || {};
-    optionsList = Object.values(val);
-    reconcileMyOrder();
-    renderVoteList();
-    renderLeaderboard();
-  });
-
-  // Live: everyone's votes (drives the leaderboard + voter count)
-  db.ref('votes').on('value', snap => {
-    const val = snap.val() || {};
-    votes = {};
-    Object.values(val).forEach(v => { if(v && v.name) votes[v.name] = v.order; });
-    if(!myOrder.length) buildMyOrder();
-    renderLeaderboard();
-    renderVoterCount();
-  });
-
-  // Live: chat
-  db.ref('messages').on('value', snap => {
-    const val = snap.val() || {};
-    messages = Object.values(val).sort((a,b)=>a.ts-b.ts);
-    renderChat();
-  });
-}
 </script>
 </body>
 </html>
