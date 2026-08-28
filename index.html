@@ -125,7 +125,7 @@
   }
   .btn-primary:disabled{opacity:.4; cursor:not-allowed; box-shadow:none;}
   .btn-primary:hover:not(:disabled){filter:brightness(1.06);}
-  .saved-note{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:12.5px; color: var(--mango-500); min-height:16px;}
+  .saved-note{ text-align:center; font-family:'Inter', sans-serif; font-size:16px; font-weight:600; color: var(--mango-500); min-height:24px; max-width:420px; line-height:1.4;}
 
   /* ---------- Name gate ---------- */
   .gate{
@@ -210,6 +210,12 @@
     </ul>
   </div>
 
+  <h2 class="section-title">Likeliness of Attending</h2>
+  <div class="directions" style="margin-bottom:12px;">
+    On a scale of 0–10, how likely are you to actually come on this trip? 10 = absolutely going, 0 = definitely not. This helps weigh the group results toward people who are actually coming.
+  </div>
+  <div class="bubble-row" id="likelihoodRow"></div>
+
   <h2 class="section-title">Choose Your Preferences</h2>
   <div class="bubble-row" id="bubbleRow"></div>
 
@@ -225,7 +231,14 @@
 <div id="adminWrap" class="admin-wrap" style="display:none;">
   <h1 style="font-family:'Fraunces',serif;">Admin: Submitted Rankings</h1>
   <p style="font-family:'JetBrains Mono', monospace; font-size:12.5px; color:var(--sand-200);">Rowan Vacation 2027 — password protected, not meant to be shared with the group.</p>
-  <button class="btn-primary" id="csvBtn" onclick="downloadCsv()" style="margin-top:14px;">Download CSV</button>
+
+  <h2 class="section-title" style="color:var(--sand-100);">Cumulative Group Results</h2>
+  <p style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--sand-200);">Weighted by each person's "Likeliness of Attending" (0–10) — a 10 counts full weight, a 5 counts half. Points: 1st = 3, 2nd = 2, 3rd = 1, each multiplied by that person's weight.</p>
+  <button class="btn-primary" onclick="downloadCumulativeCsv()" style="margin-top:10px;">Download Cumulative CSV</button>
+  <div id="cumulativeTableWrap"></div>
+
+  <h2 class="section-title" style="color:var(--sand-100); margin-top:40px;">Individual Submissions</h2>
+  <button class="btn-primary" id="csvBtn" onclick="downloadCsv()" style="margin-top:10px;">Download Individual CSV</button>
   <div id="adminTableWrap"></div>
 </div>
 
@@ -295,20 +308,24 @@ const LODGING_OPTIONS = [
    priceTotal:5072, url:'https://www.expedia.com/'},
   {id:'blue-reef', name:'Blue Reef Beach and Marina', location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
    loc:'Belize (mainland)', desc:'Beachfront resort with marina and open-air dining, rated "Wonderful" (9.2).',
-   priceTotal:8290, url:'https://www.expedia.com/'}
+   priceTotal:8290, url:'https://www.expedia.com/'},
+  {id:'lodge-jaguar-reef', name:'The Lodge at Jaguar Reef', location:'mainland', belizeCity:false, type:'hotel', queenPlus:true,
+   loc:'Hopkins', desc:'Beachfront lodge in Hopkins with breakfast included and free private parking.',
+   priceTotal:8179, url:'https://www.booking.com/'}
 ];
 
 const BUBBLES = [
-  {id:'noPlanesBoats', label:'No planes/boats to get to lodging'},
+  {id:'noPlanesBoats', label:'No planes/boats to get to lodging', pairWith:'islandOnly'},
   {id:'closeAirport', label:'Close to airport'},
   {id:'hotelOnly', label:'Hotel/Resort only (no Airbnb)', pairWith:'airbnbOnly'},
   {id:'airbnbOnly', label:'Airbnb only (no Hotel/Resort)', pairWith:'hotelOnly'},
   {id:'jungleAccess', label:'Easy access to jungle adventures'},
   {id:'queenMin', label:'Queen size bed minimum (doubles are troubles)'},
-  {id:'islandOnly', label:'Island/Caye only'}
+  {id:'islandOnly', label:'Island/Caye only', pairWith:'noPlanesBoats'}
 ];
 
 let myName = null;
+let myLikelihood = null;
 let filters = {};
 let myRanks = {1:null, 2:null, 3:null};
 
@@ -327,6 +344,19 @@ function computeVisible(){
     if(filters.islandOnly && o.location !== 'island') return false;
     return true;
   });
+}
+
+function selectLikelihood(n){
+  myLikelihood = (myLikelihood === n) ? null : n;
+  render();
+}
+
+function renderLikelihood(){
+  const el = document.getElementById('likelihoodRow');
+  el.innerHTML = Array.from({length:11}, (_, n) => {
+    const active = myLikelihood === n;
+    return `<div class="bubble ${active?'active':''}" style="min-width:44px; text-align:center;" onclick="selectLikelihood(${n})">${n}</div>`;
+  }).join('');
 }
 
 function toggleBubble(id, pairWith){
@@ -421,6 +451,7 @@ function setRank(id, rank){
 }
 
 function render(){
+  renderLikelihood();
   renderBubbles();
   renderLodgingList();
 }
@@ -447,6 +478,11 @@ function switchUser(){
 async function submitRanking(){
   const visible = computeVisible();
   const note = document.getElementById('savedNote');
+  if(myLikelihood === null){
+    note.textContent = '⚠ Please pick your "Likeliness of Attending" (0–10) before submitting.';
+    setTimeout(()=>note.textContent='', 3500);
+    return;
+  }
   if(!visible.length){
     document.getElementById('jokeOverlay').classList.add('show');
     return;
@@ -466,7 +502,7 @@ async function submitRanking(){
   btn.disabled = true; btn.textContent = 'Submitting…';
   try{
     await db.ref('submissions/' + safeKey(myName)).set({
-      name: myName, top1: payload.top1, top2: payload.top2, top3: payload.top3, updatedAt: Date.now()
+      name: myName, likelihood: myLikelihood, top1: payload.top1, top2: payload.top2, top3: payload.top3, updatedAt: Date.now()
     });
     note.textContent = '✓ Submitted — thanks! You can change your picks and resubmit anytime.';
   }catch(e){
@@ -490,6 +526,52 @@ function init(){
 const ADMIN_PASSWORD = "RowanVacay27"; // change this to whatever you like
 let adminSubmissions = [];
 
+function computeCumulative(){
+  const scores = {}; // id -> weighted points
+  const rawCounts = {}; // id -> {first,second,third}
+  LODGING_OPTIONS.forEach(o=>{ scores[o.id]=0; rawCounts[o.id]={first:0,second:0,third:0}; });
+  adminSubmissions.forEach(s=>{
+    const weight = (typeof s.likelihood === 'number' ? s.likelihood : 10) / 10;
+    if(s.top1 && scores.hasOwnProperty(s.top1)){ scores[s.top1] += 3*weight; rawCounts[s.top1].first++; }
+    if(s.top2 && scores.hasOwnProperty(s.top2)){ scores[s.top2] += 2*weight; rawCounts[s.top2].second++; }
+    if(s.top3 && scores.hasOwnProperty(s.top3)){ scores[s.top3] += 1*weight; rawCounts[s.top3].third++; }
+  });
+  return LODGING_OPTIONS
+    .map(o => ({id:o.id, name:o.name, score:scores[o.id], counts:rawCounts[o.id]}))
+    .sort((a,b)=> b.score - a.score);
+}
+
+function renderCumulative(){
+  const results = computeCumulative();
+  const el = document.getElementById('cumulativeTableWrap');
+  el.innerHTML = `<table class="admin-table">
+    <thead><tr><th>Rank</th><th>Lodging</th><th>Weighted Score</th><th>Times picked 1st / 2nd / 3rd</th></tr></thead>
+    <tbody>
+      ${results.map((r,i) => `<tr>
+        <td>${i+1}</td>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${r.score.toFixed(2)}</td>
+        <td>${r.counts.first} / ${r.counts.second} / ${r.counts.third}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+function downloadCumulativeCsv(){
+  const results = computeCumulative();
+  const header = ['Rank','Lodging','Weighted Score','Times 1st','Times 2nd','Times 3rd'];
+  const rows = results.map((r,i) => [i+1, r.name, r.score.toFixed(2), r.counts.first, r.counts.second, r.counts.third]);
+  const csv = [header, ...rows].map(r =>
+    r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'rowan-vacation-cumulative-results.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function lodgingName(id){
   const o = LODGING_OPTIONS.find(x=>x.id===id);
   return o ? o.name : (id ? id : '—');
@@ -507,16 +589,18 @@ async function initAdmin(){
   const snap = await db.ref('submissions').once('value');
   const val = snap.val() || {};
   adminSubmissions = Object.values(val);
+  renderCumulative();
   const tableEl = document.getElementById('adminTableWrap');
   if(!adminSubmissions.length){
     tableEl.innerHTML = '<p style="color:var(--sand-200); font-family:JetBrains Mono, monospace;">No submissions yet.</p>';
     return;
   }
   tableEl.innerHTML = `<table class="admin-table">
-    <thead><tr><th>Name</th><th>1st choice</th><th>2nd choice</th><th>3rd choice</th><th>Submitted</th></tr></thead>
+    <thead><tr><th>Name</th><th>Likeliness (0–10)</th><th>1st choice</th><th>2nd choice</th><th>3rd choice</th><th>Submitted</th></tr></thead>
     <tbody>
       ${adminSubmissions.map(s => `<tr>
         <td>${escapeHtml(s.name||'')}</td>
+        <td>${typeof s.likelihood === 'number' ? s.likelihood : '—'}</td>
         <td>${escapeHtml(lodgingName(s.top1))}</td>
         <td>${escapeHtml(lodgingName(s.top2))}</td>
         <td>${escapeHtml(lodgingName(s.top3))}</td>
@@ -527,9 +611,10 @@ async function initAdmin(){
 }
 
 function downloadCsv(){
-  const header = ['Name','1st Choice','2nd Choice','3rd Choice','Submitted At'];
+  const header = ['Name','Likeliness (0-10)','1st Choice','2nd Choice','3rd Choice','Submitted At'];
   const rows = adminSubmissions.map(s => [
     s.name || '',
+    typeof s.likelihood === 'number' ? s.likelihood : '',
     lodgingName(s.top1),
     lodgingName(s.top2),
     lodgingName(s.top3),
